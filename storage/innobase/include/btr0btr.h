@@ -37,10 +37,12 @@ Created 6/2/1994 Heikki Tuuri
 #include "gis0type.h"
 
 #ifndef UNIV_HOTBACKUP
+
+//在一个page页中能存储的最大记录数
 /** Maximum record size which can be stored on a page, without using the
 special big record storage structure */
 #define	BTR_PAGE_MAX_REC_SIZE	(UNIV_PAGE_SIZE / 2 - 200)
-
+//b 数的最大深度
 /** @brief Maximum depth of a B-tree in InnoDB.
 
 Note that this isn't a maximum as such; none of the tree operations
@@ -51,7 +53,7 @@ words: if a B-tree with bigger depth than this is encountered, it is
 not acceptable for it to lead to mysterious memory corruption, but it
 is acceptable for the program to die with a clear assert failure. */
 #define BTR_MAX_LEVELS		100
-
+//闩锁类型
 /** Latching modes for btr_cur_search_to_nth_level(). */
 enum btr_latch_mode {
 	/** Search a record on a leaf page and S-latch it. */
@@ -73,7 +75,7 @@ enum btr_latch_mode {
 	/** Continue searching the entire B-tree. */
 	BTR_CONT_SEARCH_TREE = 38
 };
-
+//BTR_INSERT, BTR_DELETE and BTR_DELETE_MARK是相互排斥的
 /* BTR_INSERT, BTR_DELETE and BTR_DELETE_MARK are mutually exclusive. */
 
 /** If this is ORed to btr_latch_mode, it means that the search tuple
@@ -141,6 +143,7 @@ record is in spatial index */
 			  | BTR_MODIFY_EXTERNAL))
 #endif /* UNIV_HOTBACKUP */
 
+//报告一个数据页是损坏的
 /**************************************************************//**
 Report that an index page is corrupted. */
 void
@@ -161,6 +164,8 @@ btr_corruption_report(
 	}
 
 #ifndef UNIV_HOTBACKUP
+
+//获得一棵树的跟节点并写共享排他闩锁对段的访问
 /**************************************************************//**
 Gets the root node of a tree and sx-latches it for segment access.
 @return root page, sx-latched */
@@ -171,6 +176,7 @@ btr_root_get(
 	mtr_t*			mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((nonnull));
 
+//当进行导入表空间的时候校验并调整树的根节点
 /**************************************************************//**
 Checks and adjusts the root node of a tree during IMPORT TABLESPACE.
 @return error code, or DB_SUCCESS */
@@ -180,6 +186,7 @@ btr_root_adjust_on_import(
 	const dict_index_t*	index)	/*!< in: index tree */
 	MY_ATTRIBUTE((warn_unused_result));
 
+//获得B-tree的高度(以叶子节点为0，根节点的高度)，调用者必须有S或者X闩锁锁住这个索引树
 /**************************************************************//**
 Gets the height of the B-tree (the level of the root, when the leaf
 level is assumed to be 0). The caller must hold an S or X latch on
@@ -192,6 +199,7 @@ btr_height_get(
 	mtr_t*		mtr)	/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((warn_unused_result));
 
+//获得一个缓存页并申明他的闭锁等级
 /** Gets a buffer page and declares its latching order level.
 @param[in]	page_id	page id
 @param[in]	mode	latch mode
@@ -226,6 +234,8 @@ btr_block_get_func(
 	btr_block_get_func(page_id, page_size, mode,		\
 			   __FILE__, __LINE__, index, mtr)
 # else /* UNIV_DEBUG */
+
+//获得一个缓存页并申明他的闭锁等级
 /** Gets a buffer page and declares its latching order level.
 @param page_id tablespace/page identifier
 @param page_size page size
@@ -236,6 +246,8 @@ btr_block_get_func(
 #  define btr_block_get(page_id, page_size, mode, index, mtr)	\
 	btr_block_get_func(page_id, page_size, mode, __FILE__, __LINE__, mtr)
 # endif /* UNIV_DEBUG */
+
+//获得一个缓存页并申明他的闭锁等级
 /** Gets a buffer page and declares its latching order level.
 @param page_id tablespace/page identifier
 @param page_size page size
@@ -247,6 +259,8 @@ btr_block_get_func(
 	buf_block_get_frame(btr_block_get(page_id, page_size,	\
 					  mode, index, mtr))
 #endif /* !UNIV_HOTBACKUP */
+
+//获得一个页的索引id的字段
 /**************************************************************//**
 Gets the index id field of a page.
 @return index id */
@@ -257,6 +271,9 @@ btr_page_get_index_id(
 	const page_t*	page)	/*!< in: index page */
 	MY_ATTRIBUTE((warn_unused_result));
 #ifndef UNIV_HOTBACKUP
+
+
+//获得索引页中字段等级
 /********************************************************//**
 Gets the node level field in an index page.
 @return level, leaf level == 0 */
@@ -267,6 +284,8 @@ btr_page_get_level_low(
 	const page_t*	page)	/*!< in: index page */
 	MY_ATTRIBUTE((warn_unused_result));
 #define btr_page_get_level(page, mtr) btr_page_get_level_low(page)
+
+//获取下一个索引页的number值
 /********************************************************//**
 Gets the next index page number.
 @return next page number */
@@ -277,6 +296,8 @@ btr_page_get_next(
 	const page_t*	page,	/*!< in: index page */
 	mtr_t*		mtr)	/*!< in: mini-transaction handle */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//获取前一个索引页的number值
 /********************************************************//**
 Gets the previous index page number.
 @return prev page number */
@@ -287,6 +308,8 @@ btr_page_get_prev(
 	const page_t*	page,	/*!< in: index page */
 	mtr_t*		mtr)	/*!< in: mini-transaction handle */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//释放在一个叶子页的闩锁
 /**************************************************************//**
 Releases the latch on a leaf page and bufferunfixes it. */
 UNIV_INLINE
@@ -298,6 +321,8 @@ btr_leaf_page_release(
 					BTR_MODIFY_LEAF */
 	mtr_t*		mtr)		/*!< in: mtr */
 	MY_ATTRIBUTE((nonnull));
+
+//获得在一个文件节点中的地址指针
 /**************************************************************//**
 Gets the child node file address in a node pointer.
 NOTE: the offsets array must contain all offsets for the record since
@@ -313,6 +338,7 @@ btr_node_ptr_get_child_page_no(
 	const ulint*	offsets)/*!< in: array returned by rec_get_offsets() */
 	MY_ATTRIBUTE((warn_unused_result));
 
+//在一棵新树中，创建根节点
 /** Create the root node for a new index tree.
 @param[in]	type			type of the index
 @param[in]	space			space where created
@@ -334,6 +360,7 @@ btr_create(
 	const btr_create_t*	btr_redo_create_info,
 	mtr_t*			mtr);
 
+//释放一系列索引树
 /** Free a persistent index tree if it exists.
 @param[in]	page_id		root page id
 @param[in]	page_size	page size
@@ -346,6 +373,7 @@ btr_free_if_exists(
 	index_id_t		index_id,
 	mtr_t*			mtr);
 
+//释放在一个临时表空间的索引树或者通过TRUNCATE删除表中的记录
 /** Free an index tree in a temporary tablespace or during TRUNCATE TABLE.
 @param[in]	page_id		root page id
 @param[in]	page_size	page size */
@@ -354,6 +382,7 @@ btr_free(
 	const page_id_t&	page_id,
 	const page_size_t&	page_size);
 
+//通过拆分根目录使树更高一级，并插入三元组。假设mtr在树上包含一个x锁存器
 /*************************************************************//**
 Makes tree one level higher by splitting the root, and inserts
 the tuple. It is assumed that mtr contains an x-latch on the tree.
@@ -376,6 +405,8 @@ btr_root_raise_and_insert(
 	ulint		n_ext,	/*!< in: number of externally stored columns */
 	mtr_t*		mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//重新组织一棵索引页
 /*************************************************************//**
 Reorganizes an index page.
 
@@ -401,6 +432,8 @@ btr_page_reorganize_low(
 	dict_index_t*	index,	/*!< in: the index tree of the page */
 	mtr_t*		mtr)	/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//重新组织一棵索引页
 /*************************************************************//**
 Reorganizes an index page.
 
@@ -419,6 +452,9 @@ btr_page_reorganize(
 	dict_index_t*	index,	/*!< in: the index tree of the page */
 	mtr_t*		mtr)	/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((nonnull));
+
+
+//决定在数据插入的时候是否要进行页分裂（左侧）
 /*************************************************************//**
 Decides if the page should be split at the convergence point of
 inserts converging to left.
@@ -431,6 +467,8 @@ btr_page_get_split_rec_to_left(
 				the first record on upper half page,
 				or NULL if tuple should be first */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//决定在数据插入的时候是否要进行页分裂（右侧）
 /*************************************************************//**
 Decides if the page should be split at the convergence point of
 inserts converging to right.
@@ -444,6 +482,7 @@ btr_page_get_split_rec_to_right(
 				or NULL if tuple should be first */
 	MY_ATTRIBUTE((warn_unused_result));
 
+//分页一个索引页为两半并插入行，它假设你已经在页上增加了排他锁。注意：这棵树的排他锁将会在这个函数中被释放.(这个函数总数成功的)
 /*************************************************************//**
 Splits an index page to halves and inserts the tuple. It is assumed
 that mtr holds an x-latch to the index tree. NOTE: the tree x-latch is
@@ -467,6 +506,8 @@ btr_page_split_and_insert(
 	ulint		n_ext,	/*!< in: number of externally stored columns */
 	mtr_t*		mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//插入一个数据行到非叶子节点的树中，它假定你已经在上面加了排他锁
 /*******************************************************//**
 Inserts a data tuple to a tree on a non-leaf level. It is assumed
 that mtr holds an x-latch on the tree. */
@@ -483,6 +524,8 @@ btr_insert_on_non_leaf_level_func(
 # define btr_insert_on_non_leaf_level(f,i,l,t,m)			\
 	btr_insert_on_non_leaf_level_func(f,i,l,t,__FILE__,__LINE__,m)
 #endif /* !UNIV_HOTBACKUP */
+
+//设置以行做为预定义的最小记录
 /****************************************************************//**
 Sets a record as the predefined minimum record. */
 void
@@ -492,6 +535,8 @@ btr_set_min_rec_mark(
 	mtr_t*	mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((nonnull));
 #ifndef UNIV_HOTBACKUP
+
+//删除在一个数据页中节点指针
 /*************************************************************//**
 Deletes on the upper level the node pointer to a page. */
 void
@@ -513,6 +558,8 @@ btr_check_node_ptr(
 	mtr_t*		mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((warn_unused_result));
 #endif /* UNIV_DEBUG */
+
+//假如存在一个左侧邻近的页，那么会去尝试合并它。
 /*************************************************************//**
 Tries to merge the page first to the left immediate brother if such a
 brother exists, and the node pointers to the current page and to the
@@ -534,6 +581,8 @@ btr_compress(
 				cursor position even if compression occurs */
 	mtr_t*		mtr)	/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((nonnull));
+
+//从一棵b-tree树中丢弃一页，它经常会删除从B树页中最后的记录页。如果所有的页同时被删除，它不会释放根页
 /*************************************************************//**
 Discards a page from a B-tree. This is used to remove the last record from
 a B-tree page: the whole page must be removed at the same time. This cannot
@@ -545,6 +594,8 @@ btr_discard_page(
 				the root page */
 	mtr_t*		mtr);	/*!< in: mtr */
 #endif /* !UNIV_HOTBACKUP */
+
+//分析日志充作记录并设置一个索引页作为预定义的最小的记录
 /****************************************************************//**
 Parses the redo log record for setting an index record as the predefined
 minimum record.
@@ -558,6 +609,8 @@ btr_parse_set_min_rec_mark(
 	page_t*	page,	/*!< in: page or NULL */
 	mtr_t*	mtr)	/*!< in: mtr or NULL */
 	MY_ATTRIBUTE((nonnull(1,2), warn_unused_result));
+
+//在重组织页中格式化一个日志重作记录
 /***********************************************************//**
 Parses a redo log record of reorganizing a page.
 @return end of log record or NULL */
@@ -572,6 +625,8 @@ btr_parse_page_reorganize(
 	mtr_t*		mtr)	/*!< in: mtr or NULL */
 	MY_ATTRIBUTE((warn_unused_result));
 #ifndef UNIV_HOTBACKUP
+
+//在一棵B树中获得页的数量
 /**************************************************************//**
 Gets the number of pages in a B-tree.
 @return number of pages, or ULINT_UNDEFINED if the index is unavailable */
@@ -583,6 +638,8 @@ btr_get_size(
 	mtr_t*		mtr)	/*!< in/out: mini-transaction where index
 				is s-latched */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//在一个索引树中分配一个新的文件页。
 /**************************************************************//**
 Allocates a new file page to be used in an index tree. NOTE: we assume
 that the caller has made the reservation for free extents!
@@ -605,6 +662,8 @@ btr_page_alloc(
 					for x-latching and initializing
 					the page */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//在一个索引树中释放一个文件页。
 /**************************************************************//**
 Frees a file page used in an index tree. NOTE: cannot free field external
 storage pages because the page must contain info on its level. */
@@ -615,6 +674,8 @@ btr_page_free(
 	buf_block_t*	block,	/*!< in: block to be freed, x-latched */
 	mtr_t*		mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((nonnull));
+
+//创建一个新的索引页
 /**************************************************************//**
 Creates a new index page (not the root, and also not
 used in page reorganization).  @see btr_page_empty(). */
@@ -626,6 +687,8 @@ btr_page_create(
 	dict_index_t*	index,	/*!< in: index */
 	ulint		level,	/*!< in: the B-tree level of the page */
 	mtr_t*		mtr);	/*!< in: mtr */
+
+//在一棵索引树中释放文件文件页
 /**************************************************************//**
 Frees a file page used in an index tree. Can be used also to BLOB
 external storage pages. */
@@ -637,6 +700,8 @@ btr_page_free_low(
 	ulint		level,	/*!< in: page level (ULINT_UNDEFINED=BLOB) */
 	mtr_t*		mtr)	/*!< in: mtr */
 	MY_ATTRIBUTE((nonnull));
+
+//在一棵树中获得根节点
 /**************************************************************//**
 Gets the root node of a tree and x- or s-latches it.
 @return root page, x- or s-latched */
@@ -666,6 +731,8 @@ btr_print_index(
 				and end */
 	MY_ATTRIBUTE((nonnull));
 #endif /* UNIV_BTR_PRINT */
+
+//在一条基于索引的定义文件中判断字段的长度和数量
 /************************************************************//**
 Checks the size and number of fields in a record based on the definition of
 the index.
@@ -679,6 +746,8 @@ btr_index_rec_validate(
 						should print hex dump of record
 						and page on error */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//判断索引树的一致性
 /**************************************************************//**
 Checks the consistency of an index tree.
 @return true if ok */
