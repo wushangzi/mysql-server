@@ -308,7 +308,7 @@ typedef enum {
 					last field in prefix may be just
 					a prefix of a fixed length column) */
 } ib_match_mode_t;
-
+//字段的元数据信息
 /** @struct ib_col_meta_t InnoDB column meta data. */
 typedef struct {
 	ib_col_type_t	type;		/*!< Type of the column */
@@ -322,7 +322,7 @@ typedef struct {
 
 	ib_charset_t*	charset;	/*!< Column charset */
 } ib_col_meta_t;
-
+//事务等级
 /* Note: Must be in sync with trx0trx.h */
 /** @enum ib_trx_level_t Transaction isolation levels */
 typedef enum {
@@ -351,7 +351,7 @@ typedef enum {
 	IB_TRX_SERIALIZABLE = 3		/*!< All plain SELECTs are converted to
 					LOCK IN SHARE MODE reads */
 } ib_trx_level_t;
-
+//innodb 的回调原型
 /** Generical InnoDB callback prototype. */
 typedef void (*ib_cb_t)(void);
 
@@ -445,14 +445,14 @@ ib_trx_begin(
 					transaction */
 	ib_bool_t	auto_commit);	/*!< in: auto commit after each
 					single DML */
-
+//判断事务是否是只读的
 /*****************************************************************//**
 Check if the transaction is read_only */
 ib_u32_t
 ib_trx_read_only(
 /*=============*/
         ib_trx_t        ib_trx);         /*!< in: trx handle */
-
+//释放事务资源
 /*****************************************************************//**
 Release the resources of the transaction. If the transaction was
 selected as a victim by InnoDB and rolled back then use this function
@@ -462,7 +462,7 @@ ib_err_t
 ib_trx_release(
 /*===========*/
 	ib_trx_t	ib_trx);	/*!< in: trx handle */
-
+//提交一个事务
 /*****************************************************************//**
 Commit a transaction. This function will release the schema latches too.
 It will also free the transaction handle.
@@ -471,7 +471,7 @@ ib_err_t
 ib_trx_commit(
 /*==========*/
 	ib_trx_t	ib_trx);	/*!< in: trx handle */
-
+//回滚一个事务
 /*****************************************************************//**
 Rollback a transaction. This function will release the schema latches too.
 It will also free the transaction handle.
@@ -480,7 +480,7 @@ ib_err_t
 ib_trx_rollback(
 /*============*/
 	ib_trx_t	ib_trx);	/*!< in: trx handle */
-
+//打开一个innodb表并返回一个游标
 /*****************************************************************//**
 Open an InnoDB table and return a cursor handle to it.
 @return DB_SUCCESS or err code */
@@ -491,7 +491,7 @@ ib_cursor_open_table_using_id(
 	ib_trx_t	ib_trx,		/*!< in: Current transaction handle
 					can be NULL */
 	ib_crsr_t*	ib_crsr);	/*!< out,own: InnoDB cursor */
-
+//打开一个innodb二级索引并返回一个游标
 /*****************************************************************//**
 Open an InnoDB secondary index cursor and return a cursor handle to it.
 @return DB_SUCCESS or err code */
@@ -881,7 +881,7 @@ ib_cursor_lock(
 /*===========*/
 	ib_crsr_t	ib_crsr,	/*!< in/out: InnoDB cursor */
 	ib_lck_mode_t	ib_lck_mode);	/*!< in: InnoDB lock mode */
-
+//根据表的id,设置一个在innodb中的锁
 /*****************************************************************//**
 Set the Lock an InnoDB table using the table id.
 @return DB_SUCCESS or error code */
@@ -891,7 +891,7 @@ ib_table_lock(
 	ib_trx_t	ib_trx,		/*!< in/out: transaction */
 	ib_id_u64_t	table_id,	/*!< in: table id */
 	ib_lck_mode_t	ib_lck_mode);	/*!< in: InnoDB lock mode */
-
+//设置游标的锁模式
 /*****************************************************************//**
 Set the Lock mode of the cursor.
 @return DB_SUCCESS or error code */
@@ -900,21 +900,21 @@ ib_cursor_set_lock_mode(
 /*====================*/
 	ib_crsr_t	ib_crsr,	/*!< in/out: InnoDB cursor */
 	ib_lck_mode_t	ib_lck_mode);	/*!< in: InnoDB lock mode */
-
+//设置需要访问集群索引记录的标记
 /*****************************************************************//**
 Set need to access clustered index record flag. */
 void
 ib_cursor_set_cluster_access(
 /*=========================*/
 	ib_crsr_t	ib_crsr);	/*!< in/out: InnoDB cursor */
-
+//通知一个游标告诉它这是sql statement的开始
 /*****************************************************************//**
 Inform the cursor that it's the start of an SQL statement. */
 void
 ib_cursor_stmt_begin(
 /*=================*/
 	ib_crsr_t	ib_crsr);	/*!< in: cursor */
-
+//在行数据中写入一个double值
 /*****************************************************************//**
 Write a double value to a column.
 @return DB_SUCCESS or error */
@@ -924,7 +924,7 @@ ib_tuple_write_double(
 	ib_tpl_t	ib_tpl,		/*!< in: InnoDB tuple */
 	int		col_no,		/*!< in: column number */
 	double		val);		/*!< in: value to write */
-
+//从innodb行中获取一个double值
 /*************************************************************//**
 Read a double column value from an InnoDB tuple.
 @return DB_SUCCESS or error */
@@ -934,7 +934,7 @@ ib_tuple_read_double(
 	ib_tpl_t	ib_tpl,		/*!< in: InnoDB tuple */
 	ib_ulint_t	col_no,		/*!< in: column number */
 	double*		dval);		/*!< out: double value */
-
+//从一条记录中写入一个float的值
 /*****************************************************************//**
 Write a float value to a column.
 @return DB_SUCCESS or error */
@@ -944,7 +944,7 @@ ib_tuple_write_float(
 	ib_tpl_t	ib_tpl,		/*!< in/out: tuple to write to */
 	int		col_no,		/*!< in: column number */
 	float		val);		/*!< in: value to write */
-
+//从innodb表中返回一个float值
 /*************************************************************//**
 Read a float value from an InnoDB tuple.
 @return DB_SUCCESS or error */
@@ -954,7 +954,7 @@ ib_tuple_read_float(
 	ib_tpl_t	ib_tpl,		/*!< in: InnoDB tuple */
 	ib_ulint_t	col_no,		/*!< in: column number */
 	float*		fval);		/*!< out: float value */
-
+//获得字段的类型，长度和属性
 /*****************************************************************//**
 Get a column type, length and attributes from the tuple.
 @return len of column data */
@@ -963,7 +963,7 @@ ib_col_get_name(
 /*============*/
 	ib_crsr_t	ib_crsr,	/*!< in: InnoDB cursor instance */
 	ib_ulint_t	i);		/*!< in: column index in tuple */
-
+//从索引页中返回字段名
 /*****************************************************************//**
 Get an index field name from the cursor.
 @return name of the field */
@@ -972,7 +972,7 @@ ib_get_idx_field_name(
 /*==================*/
 	ib_crsr_t	ib_crsr,	/*!< in: InnoDB cursor instance */
 	ib_ulint_t	i);		/*!< in: column index in tuple */
-
+//使用Truncate 删除表中所有记录
 /*****************************************************************//**
 Truncate a table.
 @return DB_SUCCESS or error code */
@@ -981,14 +981,14 @@ ib_table_truncate(
 /*==============*/
 	const char*	table_name,	/*!< in: table name */
 	ib_id_u64_t*	table_id);	/*!< out: new table id */
-
+//返回配置信息状态
 /*****************************************************************//**
 Get generic configure status
 @return configure status*/
 int
 ib_cfg_get_cfg();
 /*============*/
-
+//在表同步数上 自增或者自减
 /*****************************************************************//**
 Increase/decrease the memcached sync count of table to sync memcached
 DML with SQL DDLs.
@@ -998,21 +998,21 @@ ib_cursor_set_memcached_sync(
 /*=========================*/
 	ib_crsr_t	ib_crsr,	/*!< in: cursor */
 	ib_bool_t	flag);		/*!< in: true for increasing */
-
+//返回隔离级别
 /*****************************************************************//**
 Return isolation configuration set by "innodb_api_trx_level"
 @return trx isolation level*/
 ib_trx_level_t
 ib_cfg_trx_level();
 /*==============*/
-
+//返回后端提交时间的时间间隔，返回值在秒级
 /*****************************************************************//**
 Return configure value for background commit interval (in seconds)
 @return background commit interval (in seconds) */
 ib_ulint_t
 ib_cfg_bk_commit_interval();
 /*=======================*/
-
+//获得事务的开始时间
 /*****************************************************************//**
 Get a trx start time.
 @return trx start_time */
@@ -1029,7 +1029,7 @@ const char*
 ib_ut_strerr(
 /*=========*/
 	ib_err_t	num);		/*!< in: error number */
-
+//判断表是否有虚拟列
 /** Check the table whether it contains virtual columns.
 @param[in]	crsr	InnoDB Cursor
 @return true if table contains virtual column else false. */

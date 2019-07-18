@@ -31,13 +31,13 @@ InnoDB Native API
 #include "os0file.h"
 #include "que0que.h"
 #include "trx0trx.h"
-
+//判断binlog 是否允许程序使用innodb api
 /** Whether binlog is enabled for applications using InnoDB APIs */
 extern my_bool                  ib_binlog_enabled;
-
+//判断MySQL 是否允许程序使用innodb api
 /** Whether MySQL MDL is enabled for applications using InnoDB APIs */
 extern my_bool                  ib_mdl_enabled;
-
+//
 /** Whether InnoDB row lock is disabled for applications using InnoDB APIs */
 extern my_bool                  ib_disable_row_lock;
 
@@ -46,7 +46,7 @@ extern ulong			ib_trx_level_setting;
 
 /** configure value for background commit interval (in seconds) */
 extern ulong			ib_bk_commit_interval;
-
+//捕获用户错误和通过数据库引擎发现锁等待
 /********************************************************************
 Handles user errors and lock waits detected by the database engine.
 @return TRUE if it was a lock wait and we should continue running
@@ -62,7 +62,7 @@ ib_handle_errors(
 	trx_t*		trx,		/*!< in: transaction */
 	que_thr_t*	thr,		/*!< in: query thread */
 	trx_savept_t*	savept);	/*!< in: savepoint or NULL */
-
+//在一个表中设置一个锁
 /*************************************************************************
 Sets a lock on a table.
 @return error code or DB_SUCCESS */
