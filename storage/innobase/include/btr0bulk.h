@@ -32,6 +32,7 @@ Created 03/11/2014 Shaohua Wang
 
 #include <vector>
 
+//B树索引大量加载时候的数量
 /** Innodb B-tree index fill factor for bulk load. */
 extern	long	innobase_fill_factor;
 
@@ -91,71 +92,89 @@ public:
 		mem_heap_free(m_heap);
 	}
 
+	//初始化成员并写分配页
 	/** Initialize members and allocate page if needed and start mtr.
 	Note: must be called and only once right after constructor.
 	@return error code */
 	dberr_t init();
 
+
+	//在页中插入一条记录
 	/** Insert a record in the page.
 	@param[in]	rec		record
 	@param[in]	offsets		record offsets */
 	void insert(const rec_t* rec, ulint* offsets);
 
+	//
 	/** Mark end of insertion to the page. Scan all records to set page
 	dirs, and set page header members. */
 	void finish();
 
+
+	//提交一页数据
 	/** Commit mtr for a page
 	@param[in]	success		Flag whether all inserts succeed. */
 	void commit(bool success);
 
+	//压缩表是，压缩它的记录
 	/** Compress if it is compressed table
 	@return	true	compress successfully or no need to compress
 	@return	false	compress failed. */
 	bool compress();
 
+	//确认表的记录是否需要存储在外部
 	/** Check whether the record needs to be stored externally.
 	@return	true
 	@return	false */
 	bool needExt(const dtuple_t* tuple, ulint rec_size);
 
+	//存储外部的记录
 	/** Store external record
 	@param[in]	big_rec		external recrod
 	@param[in]	offsets		record offsets
 	@return	error code */
 	dberr_t storeExt(const big_rec_t* big_rec, ulint* offsets);
 
+	//获得节点的指针
 	/** Get node pointer
 	@return node pointer */
 	dtuple_t* getNodePtr();
 
+	//在一页中获取分裂的信息，当我们进行压缩失败时，我们会把数据进行对半分裂。并且分裂的数据应该被复制到一个新页中
 	/** Get split rec in the page. We split a page in half when compresssion
 	fails, and the split rec should be copied to the new page.
 	@return split rec */
 	rec_t*	getSplitRec();
 
+	//复制所有的记录在进行页分裂之后
 	/** Copy all records after split rec including itself.
 	@param[in]	rec	split rec */
 	void copyIn(rec_t*	split_rec);
 
+	//删除所有记录在页分裂之后
 	/** Remove all records after split rec including itself.
 	@param[in]	rec	split rec	*/
 	void copyOut(rec_t*	split_rec);
 
+	//设置下一页
 	/** Set next page
 	@param[in]	next_page_no	next page no */
 	void setNext(ulint	next_page_no);
 
+	//设置前一页
 	/** Set previous page
 	@param[in]	prev_page_no	previous page no */
 	void setPrev(ulint	prev_page_no);
 
+	//通过mtr的提交释放块
 	/** Release block by commiting mtr */
 	inline void release();
 
+	//开始一个事务并锁住块
 	/** Start mtr and latch block */
 	inline void latch();
 
+	//判断空间是否足够
 	/** Check if required space is available in the page for the rec
 	to be inserted.	We check fill factor & padding here.
 	@param[in]	length		required length
@@ -291,6 +310,7 @@ public:
 #endif /* UNIV_DEBUG */
 	}
 
+	//初始化
 	/** Initialization
 	Note: must be called right after constructor. */
 	void init()
@@ -301,6 +321,7 @@ public:
 		m_page_bulks = UT_NEW_NOKEY(page_bulk_vector());
 	}
 
+	//插入一条记录
 	/** Insert a tuple
 	@param[in]	tuple	tuple to insert.
 	@return error code */
@@ -309,6 +330,7 @@ public:
 		return(insert(tuple, 0));
 	}
 
+	//B树大量加载完成，我们提交最后一页
 	/** Btree bulk load finish. We commit the last page in each level
 	and copy the last page in top level to the root page of the index
 	if no error occurs.
@@ -316,19 +338,24 @@ public:
 	@return error code  */
 	dberr_t finish(dberr_t	err);
 
+	//释放所有的锁
 	/** Release all latches */
 	void release();
 
+	//重新加上所有的锁
 	/** Re-latch all latches */
 	void latch();
 
 private:
+
+	//在一定页的等级上插入一条记录
 	/** Insert a tuple to a page in a level
 	@param[in]	tuple	tuple to insert
 	@param[in]	level	B-tree level
 	@return error code */
 	dberr_t insert(dtuple_t* tuple, ulint level);
 
+	//分裂一个页
 	/** Split a page
 	@param[in]	page_bulk	page to split
 	@param[in]	next_page_bulk	next page
@@ -336,6 +363,7 @@ private:
 	dberr_t pageSplit(PageBulk* page_bulk,
 			  PageBulk* next_page_bulk);
 
+	//提交完成一页，我们设置前后页的序号，压缩压缩表中的一页并分裂这页。
 	/** Commit(finish) a page. We set next/prev page no, compress a page of
 	compressed table and split the page if compression fails, insert a node
 	pointer to father page if needed, and commit mini-transaction.
