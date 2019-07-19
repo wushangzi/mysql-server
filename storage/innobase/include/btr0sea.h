@@ -34,30 +34,45 @@ Created 2/17/1996 Heikki Tuuri
 #include "mtr0mtr.h"
 #include "ha0ha.h"
 
+//创建并初始化使用查询系统在一个数据库开始阶段
 /** Creates and initializes the adaptive search system at a database start.
 @param[in]	hash_size	hash table size. */
 void
 btr_search_sys_create(ulint hash_size);
 
+/*
+ * 重置哈希索引哈系表
+ * */
 /** Resize hash index hash table.
 @param[in]	hash_size	hash index hash table size */
 void
 btr_search_sys_resize(ulint hash_size);
 
+/*
+ * 在数据库关闭后释放自适应查询系统
+ * */
 /** Frees the adaptive search system at a database shutdown. */
 void
 btr_search_sys_free();
 
+/*
+ * 不允许系统进行自适应哈希并清空索引
+ * */
 /** Disable the adaptive hash search system and empty the index.
 @param  need_mutex      need to acquire dict_sys->mutex */
 void
 btr_search_disable(
 	bool	need_mutex);
+
+/*
+ * 允许系统进行自适应哈希查询
+ * */
 /** Enable the adaptive hash search system. */
 void
 btr_search_enable();
 
 /********************************************************************//**
+根据索引返回查询信息
 Returns search info for an index.
 @return search info; search mutex reserved */
 UNIV_INLINE
@@ -67,12 +82,19 @@ btr_search_get_info(
 	dict_index_t*	index)	/*!< in: index */
 	MY_ATTRIBUTE((nonnull));
 
+/*
+ * 创建并初始化一个查询结构
+ * */
 /** Creates and initializes a search info struct.
 @param[in]	heap		heap where created.
 @return own: search info struct */
 btr_search_t*
 btr_search_info_create(mem_heap_t* heap);
 
+
+/*
+ *返回引用的值，这个值被闩锁保护
+ * */
 /** Returns the value of ref_count. The value is protected by latch.
 @param[in]	info		search info
 @param[in]	index		index identifier
@@ -83,6 +105,7 @@ btr_search_info_get_ref_count(
 	dict_index_t*	index);
 
 /*********************************************************************//**
+ 更新查询信息
 Updates the search info. */
 UNIV_INLINE
 void
@@ -91,6 +114,11 @@ btr_search_info_update(
 	dict_index_t*	index,	/*!< in: index of the cursor */
 	btr_cur_t*	cursor);/*!< in: cursor which was just positioned */
 
+
+/*
+ * 尝试去猜测右侧查询位置基于哈希索引信息。
+ * 注意：假如模式是PAGE_CUR_LE，用于查询的场景，这个函数会返回成功。
+ * */
 /** Tries to guess the right search position based on the hash search info
 of the index. Note that if mode is PAGE_CUR_LE, which is used in inserts,
 and the function returns TRUE, then cursor->up_match and cursor->low_match
@@ -121,6 +149,10 @@ btr_search_guess_on_hash(
 	ulint		has_search_latch,
 	mtr_t*		mtr);
 
+
+/*
+ * 移出或者删除哈希项
+ * */
 /** Moves or deletes hash entries for moved records. If new_page is already
 hashed, then the hash index for page, if any, is dropped. If new_page is not
 hashed, and page is hashed, then a new hash index is built to new_page with the
@@ -135,6 +167,7 @@ btr_search_move_or_delete_hash_entries(
 	buf_block_t*	block,
 	dict_index_t*	index);
 
+//删除所有的值想索引页的自适应哈希索引项
 /** Drop any adaptive hash index entries that point to an index page.
 @param[in,out]	block	block containing index page, s- or x-latched, or an
 			index page for which we know that
@@ -144,6 +177,7 @@ btr_search_move_or_delete_hash_entries(
 void
 btr_search_drop_page_hash_index(buf_block_t* block);
 
+//删除所有的值想索引页的自适应哈希索引项
 /** Drop any adaptive hash index entries that may point to an index
 page that may be in the buffer pool, when a page is evicted from the
 buffer pool or freed in a file segment.
@@ -153,7 +187,9 @@ void
 btr_search_drop_page_hash_when_freed(
 	const page_id_t&	page_id,
 	const page_size_t&	page_size);
-
+/*
+ * 更新哈希索引页当一个简单记录被插入时
+ * */
 /** Updates the page hash index when a single record is inserted on a page.
 @param[in]	cursor	cursor which was positioned to the place to insert
 			using btr_cur_search_, and the new record has been
@@ -161,6 +197,9 @@ btr_search_drop_page_hash_when_freed(
 void
 btr_search_update_hash_node_on_insert(btr_cur_t* cursor);
 
+/*
+ * 更新哈希索引页当一个简单记录被插入时
+ * */
 /** Updates the page hash index when a single record is inserted on a page.
 @param[in]	cursor		cursor which was positioned to the
 				place to insert using btr_cur_search_...,
@@ -169,51 +208,76 @@ btr_search_update_hash_node_on_insert(btr_cur_t* cursor);
 void
 btr_search_update_hash_on_insert(btr_cur_t* cursor);
 
+/*
+ * 更新哈希索引页当一个简单记录被删除时
+ * */
 /** Updates the page hash index when a single record is deleted from a page.
 @param[in]	cursor	cursor which was positioned on the record to delete
 			using btr_cur_search_, the record is not yet deleted.*/
 void
 btr_search_update_hash_on_delete(btr_cur_t* cursor);
 
+/*
+ * 验证查询系统
+ * */
 /** Validates the search system.
 @return true if ok */
 bool
 btr_search_validate();
 
+/*
+ * 排他锁锁住查询闩锁
+ * */
 /** X-Lock the search latch (corresponding to given index)
 @param[in]	index	index handler */
 UNIV_INLINE
 void
 btr_search_x_lock(const dict_index_t* index);
 
+/*
+ * 非排他锁锁住查询闩锁
+ * */
 /** X-Unlock the search latch (corresponding to given index)
 @param[in]	index	index handler */
 UNIV_INLINE
 void
 btr_search_x_unlock(const dict_index_t* index);
 
+/*
+ * 锁住所有的查询闩锁
+ * */
 /** Lock all search latches in exclusive mode. */
 UNIV_INLINE
 void
 btr_search_x_lock_all();
 
+/*
+ * 把所有的共享锁解锁
+ * */
 /** Unlock all search latches from exclusive mode. */
 UNIV_INLINE
 void
 btr_search_x_unlock_all();
 
+/*
+ * 以共享锁的方式查询
+ * */
 /** S-Lock the search latch (corresponding to given index)
 @param[in]	index	index handler */
 UNIV_INLINE
 void
 btr_search_s_lock(const dict_index_t* index);
 
+/*
+ * 以非共享锁的方式查询
+ * */
 /** S-Unlock the search latch (corresponding to given index)
 @param[in]	index	index handler */
 UNIV_INLINE
 void
 btr_search_s_unlock(const dict_index_t* index);
 
+/*在共享模式下锁住所有的闩锁*/
 /** Lock all search latches in shared mode. */
 UNIV_INLINE
 void
@@ -238,10 +302,16 @@ btr_search_own_any(ulint mode);
 #endif /* UNIV_DEBUG */
 
 /** Unlock all search latches from shared mode. */
+/*
+ * 无锁模式查询
+ * */
 UNIV_INLINE
 void
 btr_search_s_unlock_all();
 
+/*
+ * 根据索引属性获取闩锁
+ * */
 /** Get the latch based on index attributes.
 A latch is selected from an array of latches using pair of index-id, space-id.
 @param[in]	index	index handler
@@ -250,6 +320,9 @@ UNIV_INLINE
 rw_lock_t*
 btr_get_search_latch(const dict_index_t* index);
 
+/*
+ * 根据索引属性获取哈希表
+ * */
 /** Get the hash-table based on index attributes.
 A table is selected from an array of tables using pair of index-id, space-id.
 @param[in]	index	index handler
@@ -258,8 +331,15 @@ UNIV_INLINE
 hash_table_t*
 btr_get_search_table(const dict_index_t* index);
 
+/*
+ * 在索引中的查询结构信息
+ * */
 /** The search info struct in an index */
 struct btr_search_t{
+
+	/*
+	 * 索引树的引用此树
+	 * */
 	ulint	ref_count;	/*!< Number of blocks in this index tree
 				that have search index built
 				i.e. block->index points to this index.
@@ -315,6 +395,8 @@ struct btr_search_t{
 #endif /* UNIV_DEBUG */
 };
 
+/*
+ * 哈希索引系统*/
 /** The hash index system */
 struct btr_search_sys_t{
 	hash_table_t**	hash_tables;	/*!< the adaptive hash tables,
@@ -322,9 +404,12 @@ struct btr_search_sys_t{
 					to rec_t pointers on index pages */
 };
 
+//自适应哈希用读写锁
 /** Latches protecting access to adaptive hash index. */
 extern rw_lock_t**		btr_search_latches;
 
+/*
+ * 自适应哈希索引*/
 /** The adaptive hash index */
 extern btr_search_sys_t*	btr_search_sys;
 
@@ -335,19 +420,31 @@ extern ulint	btr_search_n_succ;
 extern ulint	btr_search_n_hash_fail;
 #endif /* UNIV_SEARCH_PERF_STAT */
 
+/*
+ * 在n_fields或者n_bytes发生改变后，它会等待hash再次进行分析。它会保存CPU的时间
+ * */
 /** After change in n_fields or n_bytes in info, this many rounds are waited
 before starting the hash analysis again: this is to save CPU time when there
 is no hope in building a hash index. */
 #define BTR_SEARCH_HASH_ANALYSIS	17
 
+/*
+ *使用查询模式尝试查询路径限制
+ * */
 /** Limit of consecutive searches for trying a search shortcut on the search
 pattern */
 #define BTR_SEARCH_ON_PATTERN_LIMIT	3
 
+/*
+ *使用哈希索引尝试查询路径限制
+ * */
 /** Limit of consecutive searches for trying a search shortcut using
 the hash index */
 #define BTR_SEARCH_ON_HASH_LIMIT	3
 
+/*
+ * 超时时间
+ * */
 /** We do this many searches before trying to keep the search latch
 over calls from MySQL. If we notice someone waiting for the latch, we
 again set this much timeout. This is to reduce contention. */
