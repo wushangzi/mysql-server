@@ -35,6 +35,7 @@ Created 11/5/1995 Heikki Tuuri
 struct trx_t;
 
 /******************************************************************//**
+如果小于25%的缓存可用返回true
 Returns TRUE if less than 25 % of the buffer pool is available. This can be
 used in heuristics to prevent huge transactions eating up the whole buffer
 pool for their locks.
@@ -47,6 +48,7 @@ buf_LRU_buf_pool_running_out(void);
 These are low-level functions
 #########################################################################*/
 
+/**/
 /** Minimum LRU list length for which the LRU_old pointer is defined */
 #define BUF_LRU_OLD_MIN_LEN	512	/* 8 megabytes of 16k pages */
 
@@ -73,6 +75,7 @@ buf_LRU_insert_zip_clean(
 #endif /* UNIV_DEBUG || UNIV_BUF_DEBUG */
 
 /******************************************************************//**
+ 尝试释放block块
 Try to free a block.  If bpage is a descriptor of a compressed-only
 page, the descriptor object will be freed as well.
 
@@ -91,6 +94,7 @@ buf_LRU_free_page(
 				compressed page of an uncompressed page */
 	MY_ATTRIBUTE((nonnull));
 /******************************************************************//**
+尝试释放可替代的块
 Try to free a replaceable block.
 @return true if found and freed */
 bool
@@ -102,6 +106,7 @@ buf_LRU_scan_and_free_block(
 					'old' blocks. */
 	MY_ATTRIBUTE((nonnull,warn_unused_result));
 /******************************************************************//**
+从缓存池中返回一块空闲块
 Returns a free block from the buf_pool.  The block is taken off the
 free list.  If it is empty, returns NULL.
 @return a free control block, or NULL if the buf_block->free list is empty */
@@ -138,7 +143,10 @@ buf_LRU_get_free_block(
 /*===================*/
 	buf_pool_t*	buf_pool)	/*!< in/out: buffer pool instance */
 	MY_ATTRIBUTE((nonnull,warn_unused_result));
+
+
 /******************************************************************//**
+决定unzip_LRU列表是否用来
 Determines if the unzip_LRU list should be used for evicting a victim
 instead of the general LRU list.
 @return TRUE if should use unzip_LRU */
@@ -146,13 +154,18 @@ ibool
 buf_LRU_evict_from_unzip_LRU(
 /*=========================*/
 	buf_pool_t*	buf_pool);
+
 /******************************************************************//**
+放置一个块到空闲列表中
 Puts a block back to the free list. */
 void
 buf_LRU_block_free_non_file_page(
 /*=============================*/
 	buf_block_t*	block);	/*!< in: block, must not contain a file page */
+
+
 /******************************************************************//**
+增加一个块到LRU列表中
 Adds a block to the LRU list. Please make sure that the page_size is
 already set when invoking the function, so that we can get correct
 page_size from the buffer page when adding a block into LRU */
@@ -164,7 +177,9 @@ buf_LRU_add_block(
 				blocks in the LRU list, else put to the
 				start; if the LRU list is very short, added to
 				the start regardless of this parameter */
+
 /******************************************************************//**
+增加一个块到LRU列表中
 Adds a block to the LRU list of decompressed zip pages. */
 void
 buf_unzip_LRU_add_block(
@@ -172,19 +187,25 @@ buf_unzip_LRU_add_block(
 	buf_block_t*	block,	/*!< in: control block */
 	ibool		old);	/*!< in: TRUE if should be put to the end
 				of the list, else put to the start */
+
 /******************************************************************//**
+移动一个块到LRU列表的开始处
 Moves a block to the start of the LRU list. */
 void
 buf_LRU_make_block_young(
 /*=====================*/
 	buf_page_t*	bpage);	/*!< in: control block */
+
 /******************************************************************//**
+移动一个块到LRU列表的结尾处
 Moves a block to the end of the LRU list. */
 void
 buf_LRU_make_block_old(
 /*===================*/
 	buf_page_t*	bpage);	/*!< in: control block */
+
 /**********************************************************************//**
+更新buf_pool->LRU_old_ratio的记录
 Updates buf_pool->LRU_old_ratio.
 @return updated old_pct */
 uint

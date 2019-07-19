@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/buf0flu.h
 The database buffer pool flush algorithm
-
+数据库线程池刷新算法
 Created 11/5/1995 Heikki Tuuri
 *******************************************************/
 
@@ -32,6 +32,7 @@ Created 11/5/1995 Heikki Tuuri
 #ifndef UNIV_HOTBACKUP
 #include "buf0types.h"
 
+/*  标志page_cleaner的可用状态 */
 /** Flag indicating if the page_cleaner is in active state. */
 extern bool buf_page_cleaner_is_active;
 

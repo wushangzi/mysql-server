@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/buf0types.h
 The database buffer pool global types for the directory
-
+数据库缓存池全局类型
 Created 11/17/1995 Heikki Tuuri
 *******************************************************/
 
@@ -49,6 +49,7 @@ class FlushObserver;
 /** A buffer frame. @see page_t */
 typedef	byte	buf_frame_t;
 
+/*更新类型*/
 /** Flags for flush types */
 enum buf_flush_t {
 	BUF_FLUSH_LRU = 0,		/*!< flush via the LRU list */
@@ -59,6 +60,7 @@ enum buf_flush_t {
 	BUF_FLUSH_N_TYPES		/*!< index of last element + 1  */
 };
 
+/*从缓存池中移出一些页的算法*/
 /** Algorithm to remove the pages for a tablespace from the buffer pool.
 See buf_LRU_flush_or_remove_pages(). */
 enum buf_remove_t {
@@ -70,6 +72,9 @@ enum buf_remove_t {
 					don't remove from the buffer pool */
 };
 
+/*
+ * io适应算法
+ * */
 /** Flags for io_fix types */
 enum buf_io_fix {
 	BUF_IO_NONE = 0,		/**< no pending I/O */
@@ -80,6 +85,7 @@ enum buf_io_fix {
 					the flush_list */
 };
 
+/*srv_checksum_algorithm 增强算法，它能过通过innodb_checksum_algorithm进行修改*/
 /** Alternatives for srv_checksum_algorithm, which can be changed by
 setting innodb_checksum_algorithm */
 enum srv_checksum_algorithm_t {

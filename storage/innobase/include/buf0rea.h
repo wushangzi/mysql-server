@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/buf0rea.h
 The database buffer read
-
+数据库缓存读
 Created 11/5/1995 Heikki Tuuri
 *******************************************************/
 
@@ -30,6 +30,7 @@ Created 11/5/1995 Heikki Tuuri
 #include "buf0buf.h"
 #include "buf0types.h"
 
+/*异步读取一页*/
 /** High-level function which reads a page asynchronously from a file to the
 buffer buf_pool if it is not already there. Sets the io_fix flag and sets
 an exclusive lock on the buffer frame. The flag is cleared and the x-lock
@@ -42,6 +43,7 @@ buf_read_page(
 	const page_id_t&	page_id,
 	const page_size_t&	page_size);
 
+/*异步读取一页*/
 /** High-level function which reads a page asynchronously from a file to the
 buffer buf_pool if it is not already there. Sets the io_fix flag and sets
 an exclusive lock on the buffer frame. The flag is cleared and the x-lock
@@ -56,6 +58,9 @@ buf_read_page_background(
 	const page_size_t&	page_size,
 	bool			sync);
 
+/*
+ *申请一个随机读取缓存页
+ * */
 /** Applies a random read-ahead in buf_pool if there are at least a threshold
 value of accessed pages from the random read-ahead area. Does not read any
 page, not even the one at the position (space, offset), if the read-ahead
@@ -109,7 +114,7 @@ buf_read_ahead_linear(
 	const page_id_t&	page_id,
 	const page_size_t&	page_size,
 	ibool			inside_ibuf);
-
+search
 /********************************************************************//**
 Issues read requests for pages which the ibuf module wants to read in, in
 order to contract the insert buffer tree. Technically, this function is like
