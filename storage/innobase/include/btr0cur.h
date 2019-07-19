@@ -32,6 +32,7 @@ Created 10/16/1994 Heikki Tuuri
 #include "btr0types.h"
 #include "gis0type.h"
 
+//btr_cur操作的模式标记，能够进行或运算
 /** Mode flags for btr_cur operations; these can be ORed */
 enum {
 	/** do no undo logging */
@@ -53,6 +54,7 @@ enum {
 	BTR_KEEP_IBUF_BITMAP = 32
 };
 
+//btr_cur_latch_leaves()函数返回的闩锁块和保存点
 /* btr_cur_latch_leaves() returns latched blocks and savepoints. */
 struct btr_latch_leaves_t {
 	/* left block, target block and right block */
@@ -98,6 +100,8 @@ btr_cur_get_rec(
 # define btr_cur_get_block(cursor)	((cursor)->page_cur.block)
 # define btr_cur_get_rec(cursor)	((cursor)->page_cur.rec)
 #endif /* UNIV_DEBUG */
+
+//返回B树索引压缩页的位置
 /*********************************************************//**
 Returns the compressed page on which the tree cursor is positioned.
 @return pointer to compressed page, or NULL if the page is not compressed */
@@ -106,6 +110,8 @@ page_zip_des_t*
 btr_cur_get_page_zip(
 /*=================*/
 	btr_cur_t*	cursor);/*!< in: tree cursor */
+
+//返回一个B树游标的页信息
 /*********************************************************//**
 Returns the page of a tree cursor.
 @return pointer to page */
@@ -114,12 +120,15 @@ page_t*
 btr_cur_get_page(
 /*=============*/
 	btr_cur_t*	cursor);/*!< in: tree cursor */
+
+//返回游标的索引信息
 /*********************************************************//**
 Returns the index of a cursor.
 @param cursor b-tree cursor
 @return index */
 #define btr_cur_get_index(cursor) ((cursor)->index)
 /*********************************************************//**
+ * 在给定的数据行中定位一个树游标
 Positions a tree cursor at a given record. */
 UNIV_INLINE
 void
@@ -130,6 +139,8 @@ btr_cur_position(
 	buf_block_t*	block,	/*!< in: buffer block of rec */
 	btr_cur_t*	cursor);/*!< in: cursor */
 
+
+//乐观锁锁主叶子页
 /** Optimistically latches the leaf page or pages requested.
 @param[in]	block		guessed buffer block
 @param[in]	modify_clock	modify clock value
@@ -149,6 +160,7 @@ btr_cur_optimistic_latch_leaves(
 	ulint		line,
 	mtr_t*		mtr);
 
+//查询一个索引树并定它的游标通过给定的等级
 /********************************************************************//**
 Searches an index tree and positions a tree cursor on a given level.
 NOTE: n_fields_cmp in tuple must be set so that it cannot be compared
@@ -192,6 +204,7 @@ btr_cur_search_to_nth_level(
 	ulint		line,	/*!< in: line where called */
 	mtr_t*		mtr);	/*!< in: mtr */
 
+//查询一个索引树并定它的游标通过给定的等级
 /** Searches an index tree and positions a tree cursor on a given level.
 This function will avoid placing latches the travesal path and so
 should be used only for cases where-in latching is not needed.
@@ -221,6 +234,7 @@ btr_cur_search_to_nth_level_with_no_latch(
 	mtr_t*			mtr,
 	bool			mark_dirty = true);
 
+//在索引的任一端打开光标
 /*****************************************************************//**
 Opens a cursor at either end of an index. */
 void
@@ -239,6 +253,7 @@ btr_cur_open_at_index_side_func(
 #define btr_cur_open_at_index_side(f,i,l,c,lv,m)			\
 	btr_cur_open_at_index_side_func(f,i,l,c,lv,__FILE__,__LINE__,m)
 
+//在索引的任一端打开光标
 /** Opens a cursor at either end of an index.
 Avoid taking latches on buffer, just pin (by incrementing fix_count)
 to keep them in buffer pool. This mode is used by intrinsic table
@@ -265,6 +280,7 @@ btr_cur_open_at_index_side_with_no_latch_func(
 	btr_cur_open_at_index_side_with_no_latch_func(			\
 		f,i,c,lv,__FILE__,__LINE__,m)
 
+//定位一个游标在一个随机选择的位置上
 /**********************************************************************//**
 Positions a cursor at a randomly chosen position within a B-tree.
 @return true if the index is available and we have put the cursor, false
@@ -281,6 +297,9 @@ btr_cur_open_at_rnd_pos_func(
 #define btr_cur_open_at_rnd_pos(i,l,c,m)				\
 	btr_cur_open_at_rnd_pos_func(i,l,c,__FILE__,__LINE__,m)
 /*************************************************************//**
+ *尝试在一棵索引树中插入一条记录到一个page页中，下一个游标，它假设你已经在页上加了排他锁，
+ *加入这个页中的空间太小，它将执行不成功。假如这个页中只有一条记录，这个插入记录总是成功的，
+ 它会组织页的分裂（当仅有一条记录在一页中的时候）
 Tries to perform an insert to a page in an index tree, next to cursor.
 It is assumed that mtr holds an x-latch on the page. The operation does
 not succeed if there is too little space on the page. If there is just
@@ -312,6 +331,10 @@ btr_cur_optimistic_insert(
 				mtr_commit(mtr) before latching
 				any further pages */
 	MY_ATTRIBUTE((warn_unused_result));
+
+//尝试在一棵索引树中插入一条记录到一个page页中，下一个游标，它假设你已经在页上加了排他锁，
+//加入这个页中的空间太小，它将执行不成功。假如这个页中只有一条记录，这个插入记录总是成功的，
+//它会组织页的分裂（当仅有一条记录在一页中的时候）
 /*************************************************************//**
 Performs an insert on a page of an index tree. It is assumed that mtr
 holds an x-latch on the tree and on the cursor page. If the insert is
@@ -376,6 +399,7 @@ btr_cur_update_alloc_zip_func(
 	btr_cur_update_alloc_zip_func(page_zip,cursor,index,len,cr,mtr)
 #endif /* UNIV_DEBUG */
 /*************************************************************//**
+ * 更新一条数据，当字段的长度没有改变的情况下
 Updates a record when the update causes no size changes in its fields.
 @return locking or undo log related error code, or
 @retval DB_SUCCESS on success
@@ -400,6 +424,7 @@ btr_cur_update_in_place(
 				further pages */
 	MY_ATTRIBUTE((warn_unused_result));
 /***********************************************************//**
+ * 写入一条更新的重作日志
 Writes a redo log record of updating a record in-place. */
 void
 btr_cur_update_in_place_log(
@@ -412,6 +437,7 @@ btr_cur_update_in_place_log(
 	roll_ptr_t	roll_ptr,	/*!< in: roll ptr */
 	mtr_t*		mtr);		/*!< in: mtr */
 /*************************************************************//**
+尝试去更新数据索引树的一个页的一条记录，假设这个页已经被排他锁锁住
 Tries to update a record on a page in an index tree. It is assumed that mtr
 holds an x-latch on the page. The operation does not succeed if there is too
 little space on the page or if the update would result in too empty a page,
@@ -443,6 +469,7 @@ btr_cur_optimistic_update(
 				further pages */
 	MY_ATTRIBUTE((warn_unused_result));
 /*************************************************************//**
+ * 尝试去更新数据索引树的一个页的一条记录，假设这个页已经被排他锁锁住
 Performs an update of a record on a page of a tree. It is assumed
 that mtr holds an x-latch on the tree and on the cursor page. If the
 update is made on the leaf level, to avoid deadlocks, mtr must also
@@ -477,6 +504,7 @@ btr_cur_pessimistic_update(
 				before latching any further pages */
 	MY_ATTRIBUTE((warn_unused_result));
 /***********************************************************//**
+ *对集群索引记录删除打上一些标签。写入undo 日志中，并写入这个事务id。
 Marks a clustered index record deleted. Writes an undo log record to
 undo log on this delete marking. Writes in the trx id field the id
 of the deleting transaction, and in the roll ptr field pointer to the
@@ -495,6 +523,7 @@ btr_cur_del_mark_set_clust_rec(
 	mtr_t*		mtr)	/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((warn_unused_result));
 /***********************************************************//**
+ * 设置一个辅助索引标志是否为删除
 Sets a secondary index record delete mark to TRUE or FALSE.
 @return DB_SUCCESS, DB_LOCK_WAIT, or error number */
 dberr_t
@@ -507,6 +536,9 @@ btr_cur_del_mark_set_sec_rec(
 	mtr_t*		mtr)	/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((warn_unused_result));
 /*************************************************************//**
+   尝试一个看起来游泳的一棵树中的一页压缩。它假设你已经通过mtr对数据页加了排他锁，为了防止
+出现死锁。假如有兄弟页存在，它必须页锁住它的兄弟页。
+   注意：它假定调用者保留了足够的大小来压缩，只要它完成总是成功的
 Tries to compress a page of the tree if it seems useful. It is assumed
 that mtr holds an x-latch on the tree and on the cursor page. To avoid
 deadlocks, mtr must also own x-latches to brothers of page, if those
@@ -523,6 +555,7 @@ btr_cur_compress_if_useful(
 				cursor position even if compression occurs */
 	mtr_t*		mtr);	/*!< in/out: mini-transaction */
 /*******************************************************//**
+ * 根据树游标定位删除记录，它既定你已经对数据页增加了排他锁
 Removes the record on which the tree cursor is positioned. It is assumed
 that the mtr has an x-latch on the page where the cursor is positioned,
 but no latch on the whole tree.
@@ -550,6 +583,7 @@ btr_cur_optimistic_delete_func(
 	btr_cur_optimistic_delete_func(cursor, mtr)
 # endif /* UNIV_DEBUG */
 /*************************************************************//**
+根据树游标定位删除记录，尝试压缩这个页。
 Removes the record on which the tree cursor is positioned. Tries
 to compress the page if its fillfactor drops below a threshold
 or if it is the only page on the level. It is assumed that mtr holds
@@ -578,6 +612,7 @@ btr_cur_pessimistic_delete(
 	mtr_t*		mtr);	/*!< in: mtr */
 #endif /* !UNIV_HOTBACKUP */
 /***********************************************************//**
+分析一个重作日记记录并在适当的位置进行更新
 Parses a redo log record of updating a record in-place.
 @return end of log record or NULL */
 byte*
@@ -589,6 +624,7 @@ btr_cur_parse_update_in_place(
 	page_zip_des_t*	page_zip,/*!< in/out: compressed page, or NULL */
 	dict_index_t*	index);	/*!< in: index corresponding to page */
 /****************************************************************//**
+ 分析一个标记了删除或者未标记的聚集索引记录
 Parses the redo log record for delete marking or unmarking of a clustered
 index record.
 @return end of log record or NULL */
@@ -601,6 +637,7 @@ btr_cur_parse_del_mark_set_clust_rec(
 	page_zip_des_t*	page_zip,/*!< in/out: compressed page, or NULL */
 	dict_index_t*	index);	/*!< in: index corresponding to page */
 /****************************************************************//**
+ 分析一个标记了删除或者未标记的辅助索引记录
 Parses the redo log record for delete marking or unmarking of a secondary
 index record.
 @return end of log record or NULL */
@@ -614,6 +651,7 @@ btr_cur_parse_del_mark_set_sec_rec(
 #ifndef UNIV_HOTBACKUP
 
 /** Estimates the number of rows in a given index range.
+ * 对一个给定的索引范围估算它的记录行数
 @param[in]	index	index
 @param[in]	tuple1	range start, may also be empty tuple
 @param[in]	mode1	search mode for range start
@@ -762,6 +800,7 @@ btr_copy_externally_stored_field_prefix(
 	const byte*		data,
 	ulint			local_len);
 
+//复制一个外部的存储字符到一条记录的内存堆中
 /** Copies an externally stored field of a record to mem heap.
 The clustered index record must be protected by a lock or a page latch.
 @param[out]	len		length of the whole field
@@ -781,6 +820,7 @@ btr_copy_externally_stored_field(
 	mem_heap_t*		heap);
 
 /** Copies an externally stored field of a record to mem heap.
+复制一个外部的存储字符到一条记录的内存堆中
 @param[in]	rec		record in a clustered index; must be
 protected by a lock or a page latch
 @param[in]	offset		array returned by rec_get_offsets()
@@ -811,6 +851,7 @@ btr_push_update_extern_fields(
 	mem_heap_t*	heap);	/*!< in: memory heap */
 
 /***********************************************************//**
+给一个辅助索引记录标记一个特定的删除记录标志位，这个函数仅用于插入缓存的合并机制
 Sets a secondary index record's delete mark to the given value. This
 function is only used by the insert buffer merge mechanism. */
 void
@@ -824,6 +865,7 @@ btr_cur_set_deleted_flag_for_ibuf(
 	mtr_t*		mtr);		/*!< in/out: mini-transaction */
 
 /******************************************************//**
+这个函数用于给某一条记录标记删除位
 The following function is used to set the deleted bit of a record. */
 UNIV_INLINE
 void
@@ -833,6 +875,7 @@ btr_rec_set_deleted_flag(
 	page_zip_des_t*	page_zip,/*!< in/out: compressed page (or NULL) */
 	ulint		flag);	/*!< in: nonzero if delete marked */
 
+//锁定叶页或请求的页
 /** Latches the leaf page or pages requested.
 @param[in]	block		leaf page where the search converged
 @param[in]	page_id		page id of the leaf
@@ -851,11 +894,14 @@ btr_cur_latch_leaves(
 
 /*######################################################################*/
 
+//在删除中用悲观锁，加入页的长度小于删除页的限制，合并它到邻近的页
 /** In the pessimistic delete, if the page data size drops below this
 limit, merging it to a neighbor is tried */
 #define BTR_CUR_PAGE_COMPRESS_LIMIT(index) \
 	((UNIV_PAGE_SIZE * (ulint)((index)->merge_threshold)) / 100)
 
+
+//在一个查询数组的一个槽
 /** A slot in the path array. We store here info on a search path down the
 tree. Each slot contains data on a single level of the tree. */
 struct btr_path_t {
@@ -885,6 +931,7 @@ struct btr_path_t {
 
 #define BTR_PATH_ARRAY_N_SLOTS	250	/*!< size of path array (in slots) */
 
+//查询方法标志位
 /** Values for the flag documenting the used search method */
 enum btr_cur_method {
 	BTR_CUR_HASH = 1,	/*!< successful shortcut using
@@ -904,6 +951,7 @@ enum btr_cur_method {
 	BTR_CUR_DELETE_REF	/*!< row_purge_poss_sec() failed */
 };
 
+//b树游标结构，这里出现的定义仅仅用于让变一起知道结构体的结构
 /** The tree cursor: the definition appears here only for the compiler
 to know struct size! */
 struct btr_cur_t {
@@ -977,6 +1025,7 @@ struct btr_cur_t {
 					/* default values */
 };
 
+//这个函数用于设置删除数据的位
 /******************************************************//**
 The following function is used to set the deleted bit of a record. */
 UNIV_INLINE
