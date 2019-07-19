@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/buf0buf.h
 The database buffer pool high-level routines
-
+数据库缓存池高级
 Created 11/5/1995 Heikki Tuuri
 *******************************************************/
 
@@ -114,7 +114,7 @@ extern buf_block_t*	back_block2;	/*!< second block, for page reorganize */
 #ifndef UNIV_INNOCHECKSUM
 /** @brief States of a control block
 @see buf_page_t
-
+page 页的状态
 The enumeration values must be 0..7. */
 enum buf_page_state {
 	BUF_BLOCK_POOL_WATCH,		/*!< a sentinel for the buffer pool
@@ -138,7 +138,9 @@ enum buf_page_state {
 					before putting to the free list */
 };
 
-
+/*
+ * 这个结构体定义我们将从每一个缓存池中的信息，它用于打印表的io状态
+ * */
 /** This structure defines information we will fetch from each buffer pool. It
 will be used to print table IO stats */
 struct buf_pool_info_t{
@@ -212,6 +214,7 @@ struct buf_pool_info_t{
 					interval */
 };
 
+/*在缓存池中被使用的页*/
 /** The occupied bytes of lists in all buffer pools */
 struct buf_pools_list_size_t {
 	ulint	LRU_bytes;		/*!< LRU size in bytes */
@@ -331,6 +334,7 @@ private:
                 const page_id_t&        page_id);
 };
 
+//根据page_id_t对象进行打印
 /** Print the given page_id_t object.
 @param[in,out]	out	the output stream
 @param[in]	page_id	the page_id_t object to be printed
@@ -341,7 +345,9 @@ operator<<(
 	const page_id_t&	page_id);
 
 #ifndef UNIV_HOTBACKUP
+
 /********************************************************************//**
+ *获取护持量在所有的缓存池的实例中
 Acquire mutex on all buffer pool instances */
 UNIV_INLINE
 void
@@ -349,6 +355,7 @@ buf_pool_mutex_enter_all(void);
 /*===========================*/
 
 /********************************************************************//**
+*释放护持量在所有的缓存池的实例中
 Release mutex on all buffer pool instances */
 UNIV_INLINE
 void
@@ -356,6 +363,7 @@ buf_pool_mutex_exit_all(void);
 /*==========================*/
 
 /********************************************************************//**
+创建缓存池
 Creates the buffer pool.
 @return DB_SUCCESS if success, DB_ERROR if not enough memory or error */
 dberr_t
@@ -363,7 +371,10 @@ buf_pool_init(
 /*=========*/
 	ulint	size,		/*!< in: Size of the total pool in bytes */
 	ulint	n_instances);	/*!< in: Number of instances */
+
+
 /********************************************************************//**
+在关闭数据库的时候释放缓存池。在释放所有护持量之前不能调用它
 Frees the buffer pool at shutdown.  This must not be invoked before
 freeing all mutexes. */
 void
@@ -380,7 +391,9 @@ buf_block_will_withdrawn(
 	buf_pool_t*		buf_pool,
 	const buf_block_t*	block);
 
-/** Determines if a frame is intended to be withdrawn.
+/**
+ * 确认是否要把块撤销
+ * Determines if a frame is intended to be withdrawn.
 @param[in]	buf_pool	buffer pool instance
 @param[in]	ptr		pointer to a frame
 @retval true	if will be withdrawn */
@@ -389,11 +402,16 @@ buf_frame_will_withdrawn(
 	buf_pool_t*	buf_pool,
 	const byte*	ptr);
 
-/** Resize the buffer pool based on srv_buf_pool_size from
+/**
+ * 从srv_buf_pool_old_size中基于srv_buf_pool_size重新设置缓存池的大小
+ * Resize the buffer pool based on srv_buf_pool_size from
 srv_buf_pool_old_size. */
 void
 buf_pool_resize();
 
+/*
+ * 这里用于在本线程中重设置线程池。它等待一个事件
+ * */
 /** This is the thread for resizing buffer pool. It waits for an event and
 when waked up either performs a resizing and sleeps again.
 @param[in]	arg	a dummy parameter required by os_thread_create.
@@ -406,6 +424,7 @@ DECLARE_THREAD(buf_resize_thread)(
 	void*	arg);				/*!< in: a dummy parameter
 						required by os_thread_create */
 
+/*清除自适应哈希索引在所有的页中*/
 /********************************************************************//**
 Clears the adaptive hash index on all pages in the buffer pool. */
 void
@@ -413,19 +432,23 @@ buf_pool_clear_hash_index(void);
 /*===========================*/
 
 /*********************************************************************//**
+获得当前线程池中的页的大小，以byte返回
 Gets the current size of buffer buf_pool in bytes.
 @return size in bytes */
 UNIV_INLINE
 ulint
 buf_pool_get_curr_size(void);
 /*========================*/
+
 /*********************************************************************//**
+获得当前缓存池的长度，用frames返回
 Gets the current size of buffer buf_pool in frames.
 @return size in pages */
 UNIV_INLINE
 ulint
 buf_pool_get_n_pages(void);
 /*=======================*/
+
 /********************************************************************//**
 Gets the smallest oldest_modification lsn for any page in the pool. Returns
 zero if all modified pages have been flushed to disk.
@@ -1510,6 +1533,9 @@ ulint
 buf_pool_size_align(
 	ulint	size);
 
+/*
+ * 计算一个页的校验值
+ * */
 /** Calculate the checksum of a page from compressed table and update the
 page.
 @param[in,out]	page	page to update
@@ -1690,6 +1716,9 @@ public:
 #endif /* !UNIV_HOTBACKUP */
 };
 
+/*
+ * block块的信息
+ * */
 /** The buffer control block structure */
 
 struct buf_block_t{
@@ -1998,6 +2027,9 @@ public:
 	buf_page_t* start();
 };
 
+/*
+ * 嵌入释放ZIP块
+ * */
 /** Struct that is embedded in the free zip blocks */
 struct buf_buddy_free_t {
 	union {
@@ -2018,6 +2050,9 @@ struct buf_buddy_free_t {
 				/*!< Node of zip_free list */
 };
 
+/*
+ * 缓存池统计结构体简介
+ * */
 /** @brief The buffer pool statistics structure. */
 struct buf_pool_stat_t{
 	ulint	n_page_gets;	/*!< number of page gets performed;
@@ -2047,6 +2082,7 @@ struct buf_pool_stat_t{
 	ulint	flush_list_bytes;/*!< flush_list size in bytes */
 };
 
+/*根据给定的块的长度统计伙伴页*/
 /** Statistics of buddy blocks of a given size. */
 struct buf_buddy_stat_t {
 	/** Number of blocks allocated from the buddy system. */
@@ -2057,8 +2093,9 @@ struct buf_buddy_stat_t {
 	ib_uint64_t	relocated_usec;
 };
 
-/** @brief The buffer pool structure.
-
+/**
+ * 缓存池的结构
+ * @brief The buffer pool structure.
 NOTE! The definition appears here only for other modules of this
 directory (buf) to see it. Do not use from outside! */
 
