@@ -36,6 +36,7 @@ Created 2/23/1996 Heikki Tuuri
 #include "btr0types.h"
 #include "gis0rtree.h"
 
+//和一个游标比的相对位置
 /* Relative positions for a stored cursor position */
 enum btr_pcur_pos_t {
 	BTR_PCUR_ON		= 1,
@@ -49,6 +50,7 @@ of a scroll cursor easier */
 	BTR_PCUR_AFTER_LAST_IN_TREE	= 5	/* in an empty tree */
 };
 
+//为一个持久的游标对象分配内存并初始化
 /**************************************************************//**
 Allocates memory for a persistent cursor object and initializes the cursor.
 @return own: persistent cursor */
@@ -57,6 +59,7 @@ btr_pcur_create_for_mysql(void);
 /*============================*/
 
 /**************************************************************//**
+重置一个持久的游标对象，并释放它老的数据
 Resets a persistent cursor object, freeing ::old_rec_buf if it is
 allocated and resetting the other members to their initial values. */
 void
@@ -65,12 +68,15 @@ btr_pcur_reset(
 	btr_pcur_t*	cursor);/*!< in, out: persistent cursor */
 
 /**************************************************************//**
+ * 释放一个指定持久化的游标对象内存
 Frees the memory for a persistent cursor object. */
 void
 btr_pcur_free_for_mysql(
 /*====================*/
 	btr_pcur_t*	cursor);	/*!< in, own: persistent cursor */
+
 /**************************************************************//**
+将一个pcur的对象复制到另外一个pcur对象中（深拷贝）
 Copies the stored position of a pcur to another pcur. */
 void
 btr_pcur_copy_stored_position(
@@ -79,7 +85,9 @@ btr_pcur_copy_stored_position(
 					position info */
 	btr_pcur_t*	pcur_donate);	/*!< in: pcur from which the info is
 					copied */
+
 /**************************************************************//**
+设置老的old_rec_buf字段为空
 Sets the old_rec_buf field to NULL. */
 UNIV_INLINE
 void
@@ -88,6 +96,7 @@ btr_pcur_init(
 	btr_pcur_t*	pcur);	/*!< in: persistent cursor */
 
 /** Free old_rec_buf.
+释放老的old_rec_buf字段为空
 @param[in]	pcur	Persistent cursor holding old_rec to be freed. */
 UNIV_INLINE
 void
@@ -95,6 +104,7 @@ btr_pcur_free(
 	btr_pcur_t*	pcur);
 
 /**************************************************************//**
+初始化并打开一个持久化的游标对象到一个索引树，通过调用btr_pcur_close去关闭它
 Initializes and opens a persistent cursor to an index tree. It should be
 closed with btr_pcur_close. */
 UNIV_INLINE
@@ -117,7 +127,9 @@ btr_pcur_open_low(
 	mtr_t*		mtr);	/*!< in: mtr */
 #define btr_pcur_open(i,t,md,l,c,m)				\
 	btr_pcur_open_low(i,0,t,md,l,c,__FILE__,__LINE__,m)
+
 /**************************************************************//**
+打开一个持久化的游标对象到一棵索引树中并不进行初始化
 Opens an persistent cursor to an index tree without initializing the
 cursor. */
 UNIV_INLINE
@@ -149,6 +161,7 @@ btr_pcur_open_with_no_init_func(
 	btr_pcur_open_with_no_init_func(ix,t,md,l,cur,has,__FILE__,__LINE__,m)
 
 /*****************************************************************//**
+在索引的任意一端打开一个持久化的游标
 Opens a persistent cursor at either end of an index. */
 UNIV_INLINE
 void
@@ -164,7 +177,9 @@ btr_pcur_open_at_index_side(
 					(0=leaf) */
 	mtr_t*		mtr)		/*!< in/out: mini-transaction */
 	MY_ATTRIBUTE((nonnull));
+
 /**************************************************************//**
+ *在一个查询中根据pcur去获取匹配值
 Gets the up_match value for a pcur after a search.
 @return number of matched fields at the cursor or to the right if
 search mode was PAGE_CUR_GE, otherwise undefined */
@@ -173,7 +188,10 @@ ulint
 btr_pcur_get_up_match(
 /*==================*/
 	const btr_pcur_t*	cursor); /*!< in: persistent cursor */
+
+
 /**************************************************************//**
+ *在一个查询中根据pcur去获取匹配值
 Gets the low_match value for a pcur after a search.
 @return number of matched fields at the cursor or to the right if
 search mode was PAGE_CUR_LE, otherwise undefined */
@@ -182,7 +200,10 @@ ulint
 btr_pcur_get_low_match(
 /*===================*/
 	const btr_pcur_t*	cursor); /*!< in: persistent cursor */
+
 /**************************************************************//**
+ 如果模式为PAGE_CUR_G或者PAGE_CUR_GE，在第一条满足查询条件的记录上打开一个持久化游标。
+ 在PAGE_CUR_L或者PAGE_CUR_LE模式下，打开最后一条用户记录。假如没有这样的用户记录存在。
 If mode is PAGE_CUR_G or PAGE_CUR_GE, opens a persistent cursor on the first
 user record satisfying the search condition, in the case PAGE_CUR_L or
 PAGE_CUR_LE, on the last user record. If no such user record exists, then
@@ -204,7 +225,9 @@ btr_pcur_open_on_user_rec_func(
 	mtr_t*		mtr);		/*!< in: mtr */
 #define btr_pcur_open_on_user_rec(i,t,md,l,c,m)				\
 	btr_pcur_open_on_user_rec_func(i,t,md,l,c,__FILE__,__LINE__,m)
+
 /**********************************************************************//**
+在一个B树中随机选择位置中放置一个游标
 Positions a cursor at a randomly chosen position within a B-tree.
 @return true if the index is available and we have put the cursor, false
 if the index is unavailable */
@@ -220,7 +243,9 @@ btr_pcur_open_at_rnd_pos_func(
 	mtr_t*		mtr);		/*!< in: mtr */
 #define btr_pcur_open_at_rnd_pos(i,l,c,m)				\
 	btr_pcur_open_at_rnd_pos_func(i,l,c,__FILE__,__LINE__,m)
+
 /**************************************************************//**
+释放一个持久化游标的合适的内存堆，并设置闩锁模式
 Frees the possible memory heap of a persistent cursor and sets the latch
 mode of the persistent cursor to BTR_NO_LATCHES.
 WARNING: this function does not release the latch on the page where the
@@ -237,7 +262,10 @@ void
 btr_pcur_close(
 /*===========*/
 	btr_pcur_t*	cursor);	/*!< in: persistent cursor */
+
+
 /**************************************************************//**
+ 游标的位置通过拿到一个出世端记录的位置，之前或之后。
 The position of the cursor is stored by taking an initial segment of the
 record the cursor is positioned on, before, or after, and copying it to the
 cursor data structure, or just setting a flag if the cursor id before the
@@ -274,7 +302,9 @@ btr_pcur_restore_position_func(
 	mtr_t*		mtr);		/*!< in: mtr */
 #define btr_pcur_restore_position(l,cur,mtr)				\
 	btr_pcur_restore_position_func(l,cur,__FILE__,__LINE__,mtr)
+
 /*********************************************************//**
+ *在已经被存储的游标中获得rel_pos字段。
 Gets the rel_pos field for a cursor whose position has been stored.
 @return BTR_PCUR_ON, ... */
 UNIV_INLINE
@@ -282,7 +312,9 @@ ulint
 btr_pcur_get_rel_pos(
 /*=================*/
 	const btr_pcur_t*	cursor);/*!< in: persistent cursor */
+
 /**************************************************************//**
+提交事务并设置游标闩锁模式到BTR_NO_LATCHES
 Commits the mtr and sets the pcur latch mode to BTR_NO_LATCHES,
 that is, the cursor becomes detached.
 Function btr_pcur_store_position should be used before calling this,
@@ -294,6 +326,7 @@ btr_pcur_commit_specify_mtr(
 	btr_pcur_t*	pcur,	/*!< in: persistent cursor */
 	mtr_t*		mtr);	/*!< in: mtr to commit */
 /*********************************************************//**
+移动游标到下一条记录中
 Moves the persistent cursor to the next record in the tree. If no records are
 left, the cursor stays 'after last in tree'.
 @return TRUE if the cursor was not after last in tree */
@@ -305,6 +338,7 @@ btr_pcur_move_to_next(
 				function may release the page latch */
 	mtr_t*		mtr);	/*!< in: mtr */
 /*********************************************************//**
+移动游标到前一条记录中
 Moves the persistent cursor to the previous record in the tree. If no records
 are left, the cursor stays 'before first in tree'.
 @return TRUE if the cursor was not before first in tree */
@@ -314,7 +348,9 @@ btr_pcur_move_to_prev(
 	btr_pcur_t*	cursor,	/*!< in: persistent cursor; NOTE that the
 				function may release the page latch */
 	mtr_t*		mtr);	/*!< in: mtr */
+
 /*********************************************************//**
+将持久化游标移动到在同页中最后的记录上
 Moves the persistent cursor to the last record on the same page. */
 UNIV_INLINE
 void
@@ -323,6 +359,7 @@ btr_pcur_move_to_last_on_page(
 	btr_pcur_t*	cursor,	/*!< in: persistent cursor */
 	mtr_t*		mtr);	/*!< in: mtr */
 /*********************************************************//**
+将持久化游标移动到树中下一条用户记录上，假如在左边没有记录，游标会到树的最后记录之后
 Moves the persistent cursor to the next user record in the tree. If no user
 records are left, the cursor ends up 'after last in tree'.
 @return TRUE if the cursor moved forward, ending on a user record */
@@ -333,7 +370,10 @@ btr_pcur_move_to_next_user_rec(
 	btr_pcur_t*	cursor,	/*!< in: persistent cursor; NOTE that the
 				function may release the page latch */
 	mtr_t*		mtr);	/*!< in: mtr */
+
+
 /*********************************************************//**
+将持久化游标移动到下一页记录的第一条记录上。
 Moves the persistent cursor to the first record on the next page.
 Releases the latch on the current page, and bufferunfixes it.
 Note that there must not be modifications on the current page,
@@ -344,6 +384,7 @@ btr_pcur_move_to_next_page(
 	btr_pcur_t*	cursor,	/*!< in: persistent cursor; must be on the
 				last record of the current page */
 	mtr_t*		mtr);	/*!< in: mtr */
+
 /*********************************************************//**
 Moves the persistent cursor backward if it is on the first record
 of the page. Releases the latch on the current page, and bufferunfixes
@@ -409,6 +450,7 @@ btr_pcur_get_rec(
 # define btr_pcur_get_rec(cursor) ((cursor)->btr_cur.page_cur.rec)
 #endif /* UNIV_DEBUG */
 /*********************************************************//**
+判断持久化游标是否在一条记录中
 Checks if the persistent cursor is on a user record. */
 UNIV_INLINE
 ibool
@@ -416,6 +458,7 @@ btr_pcur_is_on_user_rec(
 /*====================*/
 	const btr_pcur_t*	cursor);/*!< in: persistent cursor */
 /*********************************************************//**
+判断持久化游标是否在一页中最后一条记录之后
 Checks if the persistent cursor is after the last user record on
 a page. */
 UNIV_INLINE
@@ -424,6 +467,7 @@ btr_pcur_is_after_last_on_page(
 /*===========================*/
 	const btr_pcur_t*	cursor);/*!< in: persistent cursor */
 /*********************************************************//**
+判断持久化游标是否在第一条记录之前在索引页中
 Checks if the persistent cursor is before the first user record on
 a page. */
 UNIV_INLINE
@@ -432,6 +476,7 @@ btr_pcur_is_before_first_on_page(
 /*=============================*/
 	const btr_pcur_t*	cursor);/*!< in: persistent cursor */
 /*********************************************************//**
+判断持久化游标是否在第一条记录之前在索引树中
 Checks if the persistent cursor is before the first user record in
 the index tree. */
 UNIV_INLINE
@@ -441,6 +486,7 @@ btr_pcur_is_before_first_in_tree(
 	btr_pcur_t*	cursor,	/*!< in: persistent cursor */
 	mtr_t*		mtr);	/*!< in: mtr */
 /*********************************************************//**
+判断持久化游标是否在最后一条记录之后
 Checks if the persistent cursor is after the last user record in
 the index tree. */
 UNIV_INLINE
@@ -450,6 +496,7 @@ btr_pcur_is_after_last_in_tree(
 	btr_pcur_t*	cursor,	/*!< in: persistent cursor */
 	mtr_t*		mtr);	/*!< in: mtr */
 /*********************************************************//**
+将持久化游标移动到相同数据页的下一条记录中
 Moves the persistent cursor to the next record on the same page. */
 UNIV_INLINE
 void
@@ -457,6 +504,7 @@ btr_pcur_move_to_next_on_page(
 /*==========================*/
 	btr_pcur_t*	cursor);/*!< in/out: persistent cursor */
 /*********************************************************//**
+将持久化游标移动到相同数据页中的上一条记录
 Moves the persistent cursor to the previous record on the same page. */
 UNIV_INLINE
 void
@@ -464,17 +512,21 @@ btr_pcur_move_to_prev_on_page(
 /*==========================*/
 	btr_pcur_t*	cursor);/*!< in/out: persistent cursor */
 /*********************************************************//**
+ * 将持久化游标移动到本页中下确界的记录
 Moves the persistent cursor to the infimum record on the same page. */
 UNIV_INLINE
 void
 btr_pcur_move_before_first_on_page(
 /*===============================*/
 	btr_pcur_t*	cursor); /*!< in/out: persistent cursor */
-
+/*持久化B树的游标位置状态*/
 /** Position state of persistent B-tree cursor. */
 enum pcur_pos_t {
+	//未被安置
 	/** The persistent cursor is not positioned. */
 	BTR_PCUR_NOT_POSITIONED = 0,
+
+	//
 	/** The persistent cursor was previously positioned.
 	TODO: currently, the state can be BTR_PCUR_IS_POSITIONED,
 	though it really should be BTR_PCUR_WAS_POSITIONED,
@@ -483,11 +535,15 @@ enum pcur_pos_t {
 	lead to problems if btr_pcur is not used the right way;
 	all current code should be ok. */
 	BTR_PCUR_WAS_POSITIONED,
+
+	//
 	/** The persistent cursor is positioned by optimistic get to the same
 	record as it was positioned at. Not used for rel_pos == BTR_PCUR_ON.
 	It may need adjustment depending on previous/current search direction
 	and rel_pos. */
 	BTR_PCUR_IS_POSITIONED_OPTIMISTIC,
+
+	//它被索引数据查询定位
 	/** The persistent cursor is positioned by index search.
 	Or optimistic get for rel_pos == BTR_PCUR_ON. */
 	BTR_PCUR_IS_POSITIONED
@@ -495,7 +551,7 @@ enum pcur_pos_t {
 
 /* The persistent B-tree cursor structure. This is used mainly for SQL
 selects, updates, and deletes. */
-
+//当前B树游标结构，它主要用于sql 的查询更新和删除
 struct btr_pcur_t{
 	btr_pcur_t() { memset(this, 0, sizeof(*this)); }
 
