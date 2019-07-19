@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/buf0buddy.h
 Binary buddy allocator for compressed pages
-
+//伙伴系统
 Created December 2006 by Marko Makela
 *******************************************************/
 
@@ -35,6 +35,8 @@ Created December 2006 by Marko Makela
 #include "buf0types.h"
 
 /**********************************************************************//**
+分配一个块，这个线程调用这个函数必须通过buf_pool->mutex锁住，并且必须不能使用buf_pool->zip_mutex
+或者任何block->mutex。
 Allocate a block.  The thread calling this function must hold
 buf_pool->mutex and must not hold buf_pool->zip_mutex or any
 block->mutex.  The buf_pool->mutex may be released and reacquired.
@@ -57,6 +59,7 @@ buf_buddy_alloc(
 	MY_ATTRIBUTE((malloc));
 
 /**********************************************************************//**
+释放一个块
 Deallocate a block. */
 UNIV_INLINE
 void
@@ -69,6 +72,9 @@ buf_buddy_free(
 	ulint		size);		/*!< in: block size,
 					up to UNIV_PAGE_SIZE */
 
+/*
+ * 重分配一个块
+ * */
 /** Reallocate a block.
 @param[in]	buf_pool	buffer pool instance
 @param[in]	buf		block to be reallocated, must be pointed
@@ -81,6 +87,9 @@ buf_buddy_realloc(
 	void*		buf,
 	ulint		size);
 
+/*
+ * 合并所有的释放的伙伴系统
+ * */
 /** Combine all pairs of free buddies.
 @param[in]	buf_pool	buffer pool instance */
 void
