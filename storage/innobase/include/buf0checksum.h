@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file buf/buf0checksum.h
 Buffer pool checksum functions, also linked from /extra/innochecksum.cc
-
+缓存池校验函数
 Created Aug 11, 2011 Vasil Dimov
 *******************************************************/
 
@@ -34,6 +34,7 @@ Created Aug 11, 2011 Vasil Dimov
 
 #endif /* !UNIV_INNOCHECKSUM */
 
+//通过crc32校验一个块
 /** Calculates the CRC32 checksum of a page. The value is stored to the page
 when it is written to a file and also checked for a match when reading from
 the file. When reading we allow both normal CRC32 and CRC-legacy-big-endian
@@ -49,6 +50,7 @@ buf_calc_page_crc32(
 	bool		use_legacy_big_endian = false);
 
 /********************************************************************//**
+通过crc32校验一页
 Calculates a page checksum which is stored to the page when it is written
 to a file. Note that we must be careful to calculate the same value on
 32-bit and 64-bit architectures.
