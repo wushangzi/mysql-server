@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /********************************************************************//**
 @file include/page0cur.h
 The page cursor
-
+页游标
 Created 10/4/1994 Heikki Tuuri
 *************************************************************************/
 
@@ -78,6 +78,7 @@ page_cur_get_rec(
 # define page_cur_get_rec(cur)		(cur)->rec
 #endif /* UNIV_DEBUG */
 /*********************************************************//**
+将游标对象设置到第一条记录之前
 Sets the cursor object to point before the first user record
 on the page. */
 UNIV_INLINE
@@ -373,6 +374,7 @@ page_parse_copy_rec_list_to_created_page(
 	dict_index_t*	index,	/*!< in: record descriptor */
 	mtr_t*		mtr);	/*!< in: mtr or NULL */
 /***********************************************************//**
+ * 格式化一条删除数据的日志记录在一个页中
 Parses log record of a record delete on a page.
 @return pointer to record end or NULL */
 byte*
@@ -397,8 +399,9 @@ page_delete_rec(
 	page_zip_des_t*		page_zip,/*!< in: compressed page descriptor */
 	const ulint*		offsets);/*!< in: offsets for record */
 
-/** Index page cursor */
-
+/** Index page cursor
+ * 索引页的游标
+ * */
 struct page_cur_t{
 	const dict_index_t*	index;
 	rec_t*		rec;	/*!< pointer to a record on page */
