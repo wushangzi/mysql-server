@@ -20,6 +20,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 @file include/mach0data.ic
 Utilities for converting data from the database file
 to the machine format.
+从数据库文件到机器格式的转行工具
 
 Created 11/28/1995 Heikki Tuuri
 ***********************************************************************/
@@ -29,6 +30,7 @@ Created 11/28/1995 Heikki Tuuri
 #include "mtr0types.h"
 
 /*******************************************************//**
+ * 这个函数用来保存1个byte的数据
 The following function is used to store data in one byte. */
 UNIV_INLINE
 void
@@ -46,6 +48,7 @@ mach_write_to_1(
 #endif /* !UNIV_INNOCHECKSUM */
 
 /*******************************************************//**
+这个函数用来保存2个byte的信息，我们在低地址保存更多有意义的数据
 The following function is used to store data in two consecutive
 bytes. We store the most significant byte to the lowest address. */
 UNIV_INLINE
@@ -63,6 +66,7 @@ mach_write_to_2(
 }
 
 /********************************************************//**
+ * 这个函数用来返回一个byte的数据
 The following function is used to fetch data from one byte.
 @return ulint integer, >= 0, < 256 */
 UNIV_INLINE
@@ -76,6 +80,7 @@ mach_read_from_1(
 }
 
 /********************************************************//**
+这个函数用来返回2个byte的数据信息
 The following function is used to fetch data from 2 consecutive
 bytes. The most significant byte is at the lowest address.
 @return ulint integer */

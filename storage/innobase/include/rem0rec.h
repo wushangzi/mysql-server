@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /********************************************************************//**
 @file include/rem0rec.h
 Record manager
-
+记录管理
 Created 5/30/1994 Heikki Tuuri
 *************************************************************************/
 
@@ -92,6 +92,7 @@ offsets[] array, first passed to rec_get_offsets() */
 #define REC_OFFS_SMALL_SIZE	10
 
 /******************************************************//**
+ * 这个函数用来个获得同一页中下一条记录的指针
 The following function is used to get the pointer of the next chained record
 on the same page.
 @return pointer to the next chained record, or NULL if none */

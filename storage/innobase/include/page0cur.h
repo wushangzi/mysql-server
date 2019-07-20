@@ -386,6 +386,7 @@ page_cur_parse_delete_rec(
 	dict_index_t*	index,	/*!< in: record descriptor */
 	mtr_t*		mtr);	/*!< in: mtr or NULL */
 /*******************************************************//**
+从一个叶子节点页删除一条记录，这个函数不会记录任何改变的信息，它经常用于导入表空间的函数
 Removes the record from a leaf page. This function does not log
 any changes. It is used by the IMPORT tablespace functions.
 @return true if success, i.e., the page did not become too empty */

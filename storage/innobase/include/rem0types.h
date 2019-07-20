@@ -27,8 +27,9 @@ Created 5/30/1994 Heikki Tuuri
 #define rem0types_h
 
 /* We define the physical record simply as an array of bytes */
+//定义的记录类型
 typedef byte	rec_t;
-
+//不同类型字段的最大值(没有blob字段类型)
 /* Maximum values for various fields (for non-blob tuples) */
 #define REC_MAX_N_FIELDS	(1024 - 1)
 #define REC_MAX_HEAP_NO		(2 * 8192 - 1)
@@ -60,10 +61,13 @@ This (3072) is the maximum index row length allowed, so we cannot create index
 prefix column longer than that. */
 #define REC_VERSION_56_MAX_INDEX_COL_LEN	3072
 
+/*
+ * innodb 行类型是Mysql 全局 枚举类型row_type中的一个子集。
+ * */
 /** Innodb row types are a subset of the MySQL global enum row_type.
 They are made into their own enum so that switch statements can account
 for each of them. */
-enum rec_format_enum {
+enum rec_format_enum {//（行格式的枚举类型）
 	REC_FORMAT_REDUNDANT	= 0,	/*!< REDUNDANT row format */
 	REC_FORMAT_COMPACT	= 1,	/*!< COMPACT row format */
 	REC_FORMAT_COMPRESSED	= 2,	/*!< COMPRESSED row format */

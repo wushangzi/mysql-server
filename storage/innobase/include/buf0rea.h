@@ -114,7 +114,7 @@ buf_read_ahead_linear(
 	const page_id_t&	page_id,
 	const page_size_t&	page_size,
 	ibool			inside_ibuf);
-search
+
 /********************************************************************//**
 Issues read requests for pages which the ibuf module wants to read in, in
 order to contract the insert buffer tree. Technically, this function is like

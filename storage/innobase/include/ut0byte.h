@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /******************************************************************//**
 @file include/ut0byte.h
 Utilities for byte operations
-
+位操作的工具
 Created 1/20/1994 Heikki Tuuri
 ***********************************************************************/
 
@@ -31,6 +31,7 @@ Created 1/20/1994 Heikki Tuuri
 #include "univ.i"
 
 /*******************************************************//**
+ * 将两个int 32值合并成一个64位的值
 Creates a 64-bit integer out of two 32-bit integers.
 @return created integer */
 UNIV_INLINE
@@ -42,6 +43,7 @@ ut_ull_create(
 	MY_ATTRIBUTE((const));
 
 /********************************************************//**
+向下取整
 Rounds a 64-bit integer downward to a multiple of a power of 2.
 @return rounded value */
 UNIV_INLINE
@@ -52,6 +54,7 @@ ut_uint64_align_down(
 	ulint		 align_no);	/*!< in: align by this number
 					which must be a power of 2 */
 /********************************************************//**
+向上取整
 Rounds ib_uint64_t upward to a multiple of a power of 2.
 @return rounded value */
 UNIV_INLINE

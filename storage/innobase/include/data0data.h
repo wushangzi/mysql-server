@@ -589,7 +589,9 @@ struct dfield_t{
 	dfield_t* clone(mem_heap_t* heap);
 };
 
-/** Structure for an SQL data tuple of fields (logical record) */
+/** Structure for an SQL data tuple of fields (logical record)
+ * SQL数据字段的结构化元组
+ * */
 struct dtuple_t {
 	ulint		info_bits;	/*!< info bits of an index record:
 					the default is 0; this field is used

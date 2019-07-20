@@ -143,6 +143,7 @@ page_cur_is_after_last(
 }
 
 /**********************************************************//**
+在一个游标中定位一个指定的记录
 Positions the cursor on the given record. */
 UNIV_INLINE
 void

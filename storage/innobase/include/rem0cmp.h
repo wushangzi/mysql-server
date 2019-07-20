@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /*******************************************************************//**
 @file include/rem0cmp.h
 Comparison services for records
-
+行比较服务头文件
 Created 7/1/1994 Heikki Tuuri
 ************************************************************************/
 
@@ -34,6 +34,7 @@ Created 7/1/1994 Heikki Tuuri
 #include <my_sys.h>
 
 /*************************************************************//**
+ * 假如两个目标字段相等，返回true
 Returns TRUE if two columns are equal for comparison purposes.
 @return TRUE if the columns are considered equal in comparisons */
 ibool
@@ -44,6 +45,7 @@ cmp_cols_are_equal(
 	ibool			check_charsets);
 					/*!< in: whether to check charsets */
 /** Compare two data fields.
+ * 比较两个数据的字段
 @param[in] mtype main type
 @param[in] prtype precise type
 @param[in] data1 data field
@@ -65,6 +67,7 @@ cmp_data_data(
 	MY_ATTRIBUTE((nonnull, warn_unused_result));
 
 /** Compare two data fields.
+ * 比较两个数据的字段
 @param[in] dfield1 data field; must have type field set
 @param[in] dfield2 data field
 @return the comparison result of dfield1 and dfield2
@@ -80,6 +83,7 @@ cmp_dfield_dfield(
 
 
 /** Compare a GIS data tuple to a physical record.
+ * 比较一个GIS数字行和一条物理记录
 @param[in] dtuple data tuple
 @param[in] rec B-tree record
 @param[in] offsets rec_get_offsets(rec)
@@ -109,6 +113,7 @@ cmp_dtuple_rec_with_gis_internal(
 	const ulint*	offsets);
 
 /** Compare a data tuple to a physical record.
+ * 比较tuple和一条物理记录
 @param[in] dtuple data tuple
 @param[in] rec B-tree record
 @param[in] offsets rec_get_offsets(rec)
@@ -130,6 +135,7 @@ cmp_dtuple_rec_with_match_low(
 	cmp_dtuple_rec_with_match_low(					\
 		tuple,rec,offsets,dtuple_get_n_fields_cmp(tuple),fields)
 /** Compare a data tuple to a physical record.
+ * 物理行与数据元组进行对比
 @param[in]	dtuple		data tuple
 @param[in]	rec		B-tree or R-tree index record
 @param[in]	index		index tree
@@ -151,6 +157,7 @@ cmp_dtuple_rec_with_match_bytes(
 	ulint*			matched_bytes)
 	MY_ATTRIBUTE((warn_unused_result));
 /** Compare a data tuple to a physical record.
+ * 物理行与数据元组进行对比
 @see cmp_dtuple_rec_with_match
 @param[in] dtuple data tuple
 @param[in] rec B-tree record
@@ -165,6 +172,7 @@ cmp_dtuple_rec(
 	const rec_t*	rec,
 	const ulint*	offsets);
 /**************************************************************//**
+ * 确认一个某个元组是否是某条记录的，元组中的最后一个字段允许是记录中一个对应字段的前缀
 Checks if a dtuple is a prefix of a record. The last field in dtuple
 is allowed to be a prefix of the corresponding field in the record.
 @return TRUE if prefix */
@@ -176,6 +184,7 @@ cmp_dtuple_is_prefix_of_rec(
 	const ulint*	offsets);/*!< in: array returned by rec_get_offsets() */
 /** Compare two physical records that contain the same number of columns,
 none of which are stored externally.
+比较两个物理行是否包含相同数量的字段，没有一个存放在外部
 @retval positive if rec1 (including non-ordering columns) is greater than rec2
 @retval negative if rec1 (including non-ordering columns) is less than rec2
 @retval 0 if rec1 is a duplicate of rec2 */
@@ -192,6 +201,7 @@ cmp_rec_rec_simple(
 					or NULL */
 	MY_ATTRIBUTE((nonnull(1,2,3,4), warn_unused_result));
 /** Compare two B-tree records.
+ * 比较两棵B树的记录
 @param[in] rec1 B-tree record
 @param[in] rec2 B-tree record
 @param[in] offsets1 rec_get_offsets(rec1, index)
@@ -217,6 +227,7 @@ cmp_rec_rec_with_match(
 	ulint*			matched_fields);
 
 /** Compare two B-tree records.
+ * 比较两棵B树的记录
 Only the common first fields are compared, and externally stored field
 are treated as equal.
 @param[in]	rec1		B-tree record
@@ -238,6 +249,7 @@ cmp_rec_rec(
 	ulint*			matched_fields = NULL);
 
 /** Compare two data fields.
+ * 比较两个数据字段
 @param[in] dfield1 data field
 @param[in] dfield2 data field
 @return the comparison result of dfield1 and dfield2
