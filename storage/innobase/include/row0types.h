@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0types.h
 Row operation global types
-
+行操作的全局类型
 Created 12/27/1996 Heikki Tuuri
 *******************************************************/
 

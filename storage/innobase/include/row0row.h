@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0row.h
 General row routines
-
+常规行路由
 Created 4/20/1996 Heikki Tuuri
 *******************************************************/
 

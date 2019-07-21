@@ -2526,13 +2526,14 @@ page_cur_parse_delete_rec(
 
 		return(NULL);
 	}
-
+    //把ptr[0]和ptr[1]进行拼接
 	/* Read the cursor rec offset as a 2-byte ulint */
 	offset = mach_read_from_2(ptr);
 	ptr += 2;
 
 	ut_a(offset <= UNIV_PAGE_SIZE);
 
+	/*假如block存在*/
 	if (block) {
 		page_t*		page		= buf_block_get_frame(block);
 		mem_heap_t*	heap		= NULL;

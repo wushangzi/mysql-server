@@ -354,7 +354,9 @@ enum que_cur_t {
 	QUE_CUR_END
 };
 
-/* Query graph query thread node: the fields are protected by the
+/*
+ * 请求线程节点的信息，该结构中的字段被trx_t::mutex所保护
+ * Query graph query thread node: the fields are protected by the
 trx_t::mutex with the exceptions named below */
 
 struct que_thr_t{

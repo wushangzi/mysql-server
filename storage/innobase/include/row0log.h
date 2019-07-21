@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0log.h
 Modification log for online index creation and online table rebuild
-
+在线索引创建和在线表创建的日志修改
 Created 2011-05-26 Marko Makela
 *******************************************************/
 

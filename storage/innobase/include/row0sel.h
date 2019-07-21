@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0sel.h
 Select
-
+数据查询
 Created 12/19/1997 Heikki Tuuri
 *******************************************************/
 

@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0uins.h
 Fresh insert undo
-
+刷新插入未重作日志
 Created 2/25/1997 Heikki Tuuri
 *******************************************************/
 

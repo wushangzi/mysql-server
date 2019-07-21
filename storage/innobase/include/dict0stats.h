@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/dict0stats.h
 Code used for calculating and manipulating table statistics.
-
+代码用来计算和控制表的状态
 Created Jan 06, 2010 Vasil Dimov
 *******************************************************/
 

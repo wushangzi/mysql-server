@@ -4645,7 +4645,7 @@ row_search_mvcc(
 	byte*		next_buf			= 0;
 	bool		spatial_search			= false;
 	ulint		end_loop			= 0;
-
+    //set the offsets_[0] = offsets_ length
 	rec_offs_init(offsets_);
 
 	ut_ad(index && pcur && search_tuple);
@@ -4666,19 +4666,19 @@ row_search_mvcc(
 		ut_ad(!sync_check_iterate(check));
 	}
 #endif /* UNIV_DEBUG */
-
+    //check assign table si discarded
 	if (dict_table_is_discarded(prebuilt->table)) {
 
 		DBUG_RETURN(DB_TABLESPACE_DELETED);
-
+    //check idb_file_missing
 	} else if (prebuilt->table->ibd_file_missing) {
 
 		DBUG_RETURN(DB_TABLESPACE_NOT_FOUND);
-
+    //check the table with innodb engines without create primary key
 	} else if (!prebuilt->index_usable) {
 
 		DBUG_RETURN(DB_MISSING_HISTORY);
-
+    //check the index is corrupted
 	} else if (dict_index_is_corrupted(prebuilt->index)) {
 
 		DBUG_RETURN(DB_CORRUPTION);
@@ -4694,7 +4694,7 @@ row_search_mvcc(
 	/*-------------------------------------------------------------*/
 	/* PHASE 0: Release a possible s-latch we are holding on the
 	adaptive hash index latch if there is someone waiting behind */
-
+    //第一阶段，释放自适应S-闩锁
 	if (trx->has_search_latch
 #ifndef INNODB_RW_LOCKS_USE_ATOMICS
 	    && rw_lock_get_writer(
@@ -4718,7 +4718,7 @@ row_search_mvcc(
 
 	/*-------------------------------------------------------------*/
 	/* PHASE 1: Try to pop the row from the prefetch cache */
-
+    //尝试从预读取缓存中返回行信息
 	if (UNIV_UNLIKELY(direction == 0)) {
 		trx->op_info = "starting index read";
 
@@ -4824,13 +4824,13 @@ row_search_mvcc(
 	}
 
 	/* We don't support sequencial scan for Rtree index, because it
-	is no meaning to do so. */
+	is no meaning to do so. *///不支持空间扫描信息
 	if (dict_index_is_spatial(index)
 		&& !RTREE_SEARCH_MODE(mode)) {
 		err = DB_END_OF_INDEX;
 		goto func_exit;
 	}
-
+    //init Mini-transaction
 	mtr_start(&mtr);
 
 	/*-------------------------------------------------------------*/
@@ -4960,8 +4960,8 @@ row_search_mvcc(
 	}
 
 	/*-------------------------------------------------------------*/
-	/* PHASE 3: Open or restore index cursor position */
-
+	/* PHASE 3: Open or restore index cursor position *///打开或则重新存储索引游标位置
+    //Releases the search latch if trx has reserved it.
 	trx_search_latch_release_if_reserved(trx);
 
 	spatial_search = dict_index_is_spatial(index)

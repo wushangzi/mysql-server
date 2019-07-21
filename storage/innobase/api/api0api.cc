@@ -161,7 +161,7 @@ struct ib_index_def_t {
 	trx_t*		usr_trx;	/*!< User transacton covering the
 					DDL operations */
 };
-
+//Innodb 表的元数据信息
 /** InnoDB table schema used during table creation */
 struct ib_table_def_t {
 	mem_heap_t*	heap;		/*!< Heap used to build this and all
@@ -178,7 +178,7 @@ struct ib_table_def_t {
 
 	dict_table_t*	table;		/* Table read from or NULL */
 };
-
+//innodb tuple 的操作
 /** InnoDB tuple used for key operations. */
 struct ib_tuple_t {
 	mem_heap_t*		heap;	/*!< Heap used to build

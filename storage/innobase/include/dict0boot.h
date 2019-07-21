@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/dict0boot.h
 Data dictionary creation and booting
-
+数据字典的创建和启动
 Created 4/18/1996 Heikki Tuuri
 *******************************************************/
 
@@ -38,6 +38,7 @@ Created 4/18/1996 Heikki Tuuri
 typedef	byte	dict_hdr_t;
 
 /**********************************************************************//**
+ * 获得一个指向数据字典头和排他锁对应页的指针
 Gets a pointer to the dictionary header and x-latches its page.
 @return pointer to the dictionary header, page x-latched */
 dict_hdr_t*
@@ -45,6 +46,7 @@ dict_hdr_get(
 /*=========*/
 	mtr_t*	mtr);	/*!< in: mtr */
 /**********************************************************************//**
+返回一个新的表，索引或者空间id
 Returns a new table, index, or space id. */
 void
 dict_hdr_get_new_id(
@@ -59,6 +61,7 @@ dict_hdr_get_new_id(
 	bool			disable_redo);	/*!< in: if true and table
 						object is NULL
 						then disable-redo */
+
 /**********************************************************************//**
 Writes the current value of the row id counter to the dictionary header file
 page. */

@@ -20,7 +20,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/dict0dict.h
 Data dictionary system
-
+数据字典系统
 Created 1/8/1996 Heikki Tuuri
 *******************************************************/
 

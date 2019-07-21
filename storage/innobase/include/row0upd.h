@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0upd.h
 Update of a row
-
+更新行记录
 Created 12/27/1996 Heikki Tuuri
 *******************************************************/
 

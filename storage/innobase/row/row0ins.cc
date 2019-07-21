@@ -3676,6 +3676,7 @@ row_ins_get_row_from_select(
 
 /***********************************************************//**
 Inserts a row to a table.
+将一条记录插入到表中
 @return DB_SUCCESS if operation successfully completed, else error
 code or DB_LOCK_WAIT */
 static MY_ATTRIBUTE((nonnull, warn_unused_result))
@@ -3770,24 +3771,27 @@ row_ins_step(
 	ut_ad(thr);
 
 	DEBUG_SYNC_C("innodb_row_ins_step_enter");
-
+    //获得事务信息
 	trx = thr_get_trx(thr);
-
+    //开始事务
 	trx_start_if_not_started_xa(trx, true);
-
+    //开启智能指针获取节点信息
 	node = static_cast<ins_node_t*>(thr->run_node);
-
+    //判断请求类型是否为QUE_NODE_INSERT
 	ut_ad(que_node_get_type(node) == QUE_NODE_INSERT);
 	ut_ad(!dict_table_is_intrinsic(node->table));
-
+    //获得父级节点的信息
 	parent = que_node_get_parent(node);
+	//查询模式
 	sel_node = node->select;
-
+    //判断前节点和父节点是否相同
 	if (thr->prev_node == parent) {
 		node->state = INS_NODE_SET_IX_LOCK;
 	}
 
-	/* If this is the first time this node is executed (or when
+	/*
+	 * 假如是第一次进入这个执行方法体，会对表加入一个排他意向锁。
+	 * If this is the first time this node is executed (or when
 	execution resumes after wait for the table IX lock), set an
 	IX lock on the table and reset the possible select node. MySQL's
 	partitioned table code may also call an insert within the same
@@ -3798,6 +3802,8 @@ row_ins_step(
 	it again here. But we must write trx->id to node->trx_id_buf. */
 
 	memset(node->trx_id_buf, 0, DATA_TRX_ID_LEN);
+
+	/*事务写入*/
 	trx_write_trx_id(node->trx_id_buf, trx->id);
 
 	if (node->state == INS_NODE_SET_IX_LOCK) {

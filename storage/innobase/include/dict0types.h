@@ -51,6 +51,9 @@ DICT_IBUF_ID_MIN plus the space id */
 typedef ib_id_t		table_id_t;
 typedef ib_id_t		index_id_t;
 
+/*
+ *
+ * */
 /** Error to ignore when we load table dictionary into memory. However,
 the table and index will be marked as "corrupted", and caller will
 be responsible to deal with corrupted table or index.
@@ -72,7 +75,9 @@ enum dict_err_ignore_t {
 	DICT_ERR_IGNORE_ALL = 0xFFFF	/*!< ignore all errors */
 };
 
-/** Quiescing states for flushing tables to disk. */
+/**
+ * 将表刷新如磁盘的状态
+ * Quiescing states for flushing tables to disk. */
 enum ib_quiesce_t {
 	QUIESCE_NONE,
 	QUIESCE_START,			/*!< Initialise, prepare to start */

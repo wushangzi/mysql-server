@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/dict0crea.h
 Database object creation
-
+数据对象的创建
 Created 1/8/1996 Heikki Tuuri
 *******************************************************/
 

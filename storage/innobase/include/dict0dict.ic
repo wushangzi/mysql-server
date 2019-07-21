@@ -1692,6 +1692,7 @@ dict_table_is_encrypted(
 	return(DICT_TF2_FLAG_IS_SET(table, DICT_TF2_ENCRYPTION));
 }
 
+/*判断表是否为内部表*/
 /** Check whether the table is intrinsic.
 An intrinsic table is a special kind of temporary table that
 is invisible to the end user.  It can be created internally by InnoDB, the MySQL

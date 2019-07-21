@@ -572,7 +572,9 @@ dtuple_big_rec_free(
 
 /*######################################################################*/
 
-/** Structure for an SQL data field */
+/** Structure for an SQL data field
+ * 字段信息
+ *  */
 struct dfield_t{
 	void*		data;	/*!< pointer to data */
 	unsigned	ext:1;	/*!< TRUE=externally stored, FALSE=local */

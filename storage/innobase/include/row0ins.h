@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0ins.h
 Insert into a table
-
+数据插入
 Created 4/20/1996 Heikki Tuuri
 *******************************************************/
 
@@ -34,6 +34,7 @@ Created 4/20/1996 Heikki Tuuri
 #include "row0types.h"
 
 /***************************************************************//**
+ * 插入数据时，进行外键值的判断
 Checks if foreign key constraint fails for an index entry. Sets shared locks
 which lock either the success or the failure of the constraint. NOTE that
 the caller must have a shared latch on dict_foreign_key_check_lock.
@@ -54,6 +55,7 @@ row_ins_check_foreign_constraint(
 	que_thr_t*	thr)	/*!< in: query thread */
 	MY_ATTRIBUTE((nonnull, warn_unused_result));
 /*********************************************************************//**
+ * 创建一个插入节点结构
 Creates an insert node struct.
 @return own: insert node struct */
 ins_node_t*
@@ -196,6 +198,7 @@ row_ins_sec_index_entry(
 				and return. don't execute actual insert. */
 	MY_ATTRIBUTE((warn_unused_result));
 /***********************************************************//**
+在表中插入以行，这是高级封装函数用于sql的执行
 Inserts a row to a table. This is a high-level function used in
 SQL execution graphs.
 @return query thread to run next or NULL */
@@ -204,17 +207,32 @@ row_ins_step(
 /*=========*/
 	que_thr_t*	thr);	/*!< in: query thread */
 
-/* Insert node structure */
+/*
+ * 插入节点结构的信息
+ *  Insert node structure */
 
 struct ins_node_t{
 	que_common_t	common;	/*!< node type: QUE_NODE_INSERT */
+	/*
+	 * INS_VALUES: insert into .....values;
+	 * INS_SEARCHED: insert into ...... select
+	 * */
 	ulint		ins_type;/* INS_VALUES, INS_SEARCHED, or INS_DIRECT */
+
+	/*
+	 * 要插入的元组数据
+	 * */
 	dtuple_t*	row;	/*!< row to insert */
+	/*插入的表的信息*/
 	dict_table_t*	table;	/*!< table where to insert */
+
+	/*在insert into ..... select 模式下，select 的查询信息*/
 	sel_node_t*	select;	/*!< select in searched insert */
+
+	/*在insert into ..... values 模式下values 的表达式值*/
 	que_node_t*	values_list;/* list of expressions to evaluate and
 				insert in an INS_VALUES insert */
-	ulint		state;	/*!< node execution state */
+	ulint		state;	/*节点执行状态!< node execution state */
 	dict_index_t*	index;	/*!< NULL, or the next index where the index
 				entry should be inserted */
 	dtuple_t*	entry;	/*!< NULL, or entry to insert in the index;

@@ -2155,7 +2155,7 @@ btr_cur_open_at_index_side_func(
 	mem_heap_t*	heap		= NULL;
 	ulint		offsets_[REC_OFFS_NORMAL_SIZE];
 	ulint*		offsets		= offsets_;
-	rec_offs_init(offsets_);
+	rec_offs_init(offsets_);//设置offsets_中的首地址为100
 
 	estimate = latch_mode & BTR_ESTIMATE;
 	latch_mode &= ~BTR_ESTIMATE;

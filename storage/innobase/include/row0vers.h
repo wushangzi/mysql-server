@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0vers.h
 Row versions
-
+行版本
 Created 2/6/1997 Heikki Tuuri
 *******************************************************/
 

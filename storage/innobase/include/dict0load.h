@@ -20,7 +20,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 @file include/dict0load.h
 Loads to the memory cache database object definitions
 from dictionary tables
-
+从字典表中加载内存缓存定义数据
 Created 4/24/1996 Heikki Tuuri
 *******************************************************/
 

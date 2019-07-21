@@ -20,7 +20,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/dict0mem.h
 Data dictionary memory object creation
-
+创建数据字典内存对象
 Created 1/8/1996 Heikki Tuuri
 *******************************************************/
 

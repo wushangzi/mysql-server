@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 /**************************************************//**
 @file include/row0trunc.h
 TRUNCATE implementation
-
+truncate 实现
 Created 2013-04-25 Krunal Bauskar
 *******************************************************/
 
