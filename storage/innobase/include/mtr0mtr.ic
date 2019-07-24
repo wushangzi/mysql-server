@@ -160,7 +160,7 @@ mtr_t::x_latch_at_savepoint(
 }
 
 /**
-Releases the block in an mtr memo after a savepoint. */
+Releases the block in an mtr memo after a savepoint. 在一个保存点后释放块的mtr内存对象*/
 
 void
 mtr_t::release_block_at_savepoint(

@@ -308,7 +308,7 @@ buf_block_set_state(
 }
 
 /*********************************************************************//**
-Determines if a block is mapped to a tablespace.
+Determines if a block is mapped to a tablespace.      确认一个块是否映射在一个表空间中
 @return TRUE if mapped */
 UNIV_INLINE
 ibool
@@ -916,7 +916,7 @@ buf_block_fix(
 	return(os_atomic_increment_uint32(&bpage->buf_fix_count, 1));
 }
 
-/** Increments the bufferfix count.
+/** Increments the bufferfix count.   将块的进行自增
 @param[in,out]	block	block to bufferfix
 @return the count */
 UNIV_INLINE

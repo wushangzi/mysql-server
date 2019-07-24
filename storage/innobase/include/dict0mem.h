@@ -1362,13 +1362,13 @@ struct dict_table_t {
 	/** Space where the clustered index of the table is placed. */
 	uint32_t				space;
 
-	/** Stores information about:
-	1 row format (redundant or compact),
-	2 compressed page size (zip shift size),
-	3 whether using atomic blobs,
-	4 whether the table has been created with the option DATA DIRECTORY.
-	Use DICT_TF_GET_COMPACT(), DICT_TF_GET_ZIP_SSIZE(),
-	DICT_TF_HAS_ATOMIC_BLOBS() and DICT_TF_HAS_DATA_DIR() to parse this
+	/** Stores information about:                                              存储的信息有:
+	1 row format (redundant or compact),                                     1.行的格式(redundant或者compact)
+	2 compressed page size (zip shift size),                                 2.压缩页的长度
+	3 whether using atomic blobs,                                            3.是否使用原子块
+	4 whether the table has been created with the option DATA DIRECTORY.     4.表创建是否有data directory
+	Use DICT_TF_GET_COMPACT(), DICT_TF_GET_ZIP_SSIZE(),                      可以使用DICT_TF_GET_COMPACT，DICT_TF_GET_ZIP_SSIZE，DICT_TF_HAS_ATOMIC_BLOBS
+	DICT_TF_HAS_ATOMIC_BLOBS() and DICT_TF_HAS_DATA_DIR() to parse this      DICT_TF_HAS_DATA_DIR去格式化这些标识位
 	flag. */
 	unsigned				flags:DICT_TF_BITS;
 

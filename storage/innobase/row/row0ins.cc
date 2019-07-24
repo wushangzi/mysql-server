@@ -2500,7 +2500,7 @@ row_ins_clust_index_entry_low(
 	the function will return in both low_match and up_match of the
 	cursor sensible values */ /*我们使用PAGE_CUR_LE作为搜索模式，因为这个函数会返回底部和顶部的游标*/
 	btr_pcur_open(index, entry, PAGE_CUR_LE, mode, &pcur, &mtr);
-	cursor = btr_pcur_get_btr_cur(&pcur);
+	cursor = btr_pcur_get_btr_cur(&pcur);//cursor->btr_cur
 	cursor->thr = thr;
 
 	ut_ad(!dict_table_is_intrinsic(index->table)

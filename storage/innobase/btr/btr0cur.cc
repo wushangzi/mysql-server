@@ -872,7 +872,7 @@ btr_cur_search_to_nth_level(
 	ut_ad(btr_op == BTR_NO_OP || !dict_index_is_spatial(index));
 
 	estimate = latch_mode & BTR_ESTIMATE;
-
+    //内部锁的信息
 	lock_intention = btr_cur_get_and_clear_intention(&latch_mode);
 
 	modify_external = latch_mode & BTR_MODIFY_EXTERNAL;
@@ -893,7 +893,7 @@ btr_cur_search_to_nth_level(
 #ifndef BTR_CUR_ADAPT
 	guess = NULL;
 #else
-	info = btr_search_get_info(index);
+	info = btr_search_get_info(index);//index->search_info
     //判断缓存池是否过期
 	if (!buf_pool_is_obsolete(info->withdraw_clock)) {
 		guess = info->root_guess;
@@ -954,7 +954,7 @@ btr_cur_search_to_nth_level(
 	/* Store the position of the tree latch we push to mtr so that we
 	know how to release it when we have latched leaf node(s) */
 
-	savepoint = mtr_set_savepoint(mtr);
+	savepoint = mtr_set_savepoint(mtr);//设置保存点
 
 	switch (latch_mode) {
 	case BTR_MODIFY_TREE:
@@ -1017,9 +1017,9 @@ btr_cur_search_to_nth_level(
 	}
 	root_leaf_rw_latch = btr_cur_latch_for_root_leaf(latch_mode);
 
-	page_cursor = btr_cur_get_page_cur(cursor);
+	page_cursor = btr_cur_get_page_cur(cursor);//cursor->page_cur
 
-	const ulint		space = dict_index_get_space(index);
+	const ulint		space = dict_index_get_space(index);//index->space
 	const page_size_t	page_size(dict_table_page_size(index->table));
 
 	/* Start with the root page. */
@@ -1222,10 +1222,10 @@ retry_page_get:
 		tree_blocks[n_blocks] = block;
 	}
 
-	page = buf_block_get_frame(block);
+	page = buf_block_get_frame(block);//block->frame
 
 	if (height == ULINT_UNDEFINED
-	    && page_is_leaf(page)
+	    && page_is_leaf(page)//判断页是否为树叶节点
 	    && rw_latch != RW_NO_LATCH
 	    && rw_latch != root_leaf_rw_latch) {
 		/* We should retry to get the page, because the root page
@@ -1428,8 +1428,8 @@ retry_page_get:
 		}
 	} else if (height == 0 && btr_search_enabled
 		   && !dict_index_is_spatial(index)) {
-		/* The adaptive hash index is only used when searching
-		for leaf pages (height==0), but not in r-trees.
+		/* The adaptive hash index is only used when searching       自适应hash索引仅用于当查询叶页当等时候，
+		for leaf pages (height==0), but not in r-trees.              但不能在r-trees上使用。
 		We only need the byte prefix comparison for the purpose
 		of updating the adaptive hash index. */
 		page_cur_search_with_match_bytes(
@@ -3032,10 +3032,10 @@ btr_cur_prefetch_siblings(
 }
 
 /*************************************************************//**
-Tries to perform an insert to a page in an index tree, next to cursor.
-It is assumed that mtr holds an x-latch on the page. The operation does
-not succeed if there is too little space on the page. If there is just
-one record on the page, the insert will always succeed; this is to
+Tries to perform an insert to a page in an index tree, next to cursor.    尝试在索引树页中进行一次插入操作，指向下一个游标
+It is assumed that mtr holds an x-latch on the page. The operation does   它假设mtr在页中已经加入了一个排他锁。假如页空间太小，那么
+not succeed if there is too little space on the page. If there is just    插入操作不会成功。假如页中仅有一条记录，那么这个操作总是成功
+one record on the page, the insert will always succeed; this is to        这是为了防止试图用一条记录拆分一个页面
 prevent trying to split a page with just one record.
 @return DB_SUCCESS, DB_WAIT_LOCK, DB_FAIL, or error number */
 dberr_t
@@ -3100,7 +3100,7 @@ btr_cur_optimistic_insert(
 
 	leaf = page_is_leaf(page);
 
-	/* Calculate the record size when entry is converted to a record */
+	/* Calculate the record size when entry is converted to a record   计算记录的长度当entry格式化成一条记录后 */
 	rec_size = rec_get_converted_size(index, entry, n_ext);
 
 	if (page_zip_rec_needs_ext(rec_size, page_is_comp(page),
@@ -3167,7 +3167,7 @@ fail_err:
 		goto fail;
 	}
 
-	/* If there have been many consecutive inserts to the
+	/* If there have been many consecutive inserts to the       如果有很多连续不断的插入到聚集索引中
 	clustered index leaf page of an uncompressed table, check if
 	we have to split the page to reserve enough free space for
 	future updates of records. */
@@ -3193,9 +3193,9 @@ fail_err:
 	DBUG_EXECUTE_IF("do_page_reorganize",
 			btr_page_reorganize(page_cursor, index, mtr););
 
-	/* Now, try the insert */
+	/* Now, try the insert  进行尝试插入 */
 	{
-		const rec_t*	page_cursor_rec = page_cur_get_rec(page_cursor);
+		const rec_t*	page_cursor_rec = page_cur_get_rec(page_cursor);//page_cursor->rec
 
 		if (dict_table_is_intrinsic(index->table)) {
 

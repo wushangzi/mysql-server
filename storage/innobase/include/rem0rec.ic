@@ -1466,7 +1466,7 @@ rec_get_data_size_old(
 }
 
 /**********************************************************//**
-The following function sets the number of fields in offsets. */
+The following function sets the number of fields in offsets. 这个函数用来在offsets中设置记录的字段的数量 */
 UNIV_INLINE
 void
 rec_offs_set_n_fields(
@@ -1613,7 +1613,7 @@ rec_get_converted_extra_size(
 }
 
 /**********************************************************//**
-The following function returns the size of a data tuple when converted to
+The following function returns the size of a data tuple when converted to  本方法将数据元组格式化为一条物理行所需要的长度
 a physical record.
 @return size */
 UNIV_INLINE

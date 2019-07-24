@@ -3517,7 +3517,7 @@ buf_page_make_young(
 }
 
 /********************************************************************//**
-Moves a page to the start of the buffer pool LRU list if it is too old.
+Moves a page to the start of the buffer pool LRU list if it is too old.   判断是否需要将数据放入年轻代中
 This high-level function can be used to prevent an important page from
 slipping out of the buffer pool. */
 static
@@ -3957,8 +3957,8 @@ buf_pointer_is_block_field(
 }
 
 /********************************************************************//**
-Find out if a buffer block was created by buf_chunk_init().
-@return TRUE if "block" has been added to buf_pool->free by buf_chunk_init() */
+Find out if a buffer block was created by buf_chunk_init().                       假如一个缓存块被buf_chunk_init创建，找出来
+@return TRUE if "block" has been added to buf_pool->free by buf_chunk_init()      如果块通过buf_chunk_init被增加到buf_pool->free中，返回真*/
 static
 ibool
 buf_block_is_uncompressed(
@@ -4068,7 +4068,7 @@ buf_page_get_gen(
 	rw_lock_t*	hash_lock;
 	buf_block_t*	fix_block;
 	ulint		retries = 0;
-	buf_pool_t*	buf_pool = buf_pool_get(page_id);
+	buf_pool_t*	buf_pool = buf_pool_get(page_id);//根据page_id通过hash计算出在buf_pool中的位置。
 
 	ut_ad(mtr->is_active());
 	ut_ad((rw_latch == RW_S_LATCH)
@@ -4114,9 +4114,9 @@ loop:
 
 	if (block != NULL) {
 
-		/* If the guess is a compressed page descriptor that
-		has been allocated by buf_page_alloc_descriptor(),
-		it may have been freed by buf_relocate(). */
+		/* If the guess is a compressed page descriptor that     假如guess是一个压缩页文件描述符，它会被
+		has been allocated by buf_page_alloc_descriptor(),       buf_page_alloc_descriptor分配。它会
+		it may have been freed by buf_relocate().                被buf_relocate所释放*/
 
 		if (!buf_block_is_uncompressed(buf_pool, block)
 		    || !page_id.equals_to(block->page.id)
@@ -4249,7 +4249,7 @@ loop:
 	/* Now safe to release page_hash mutex */
 	rw_lock_s_unlock(hash_lock);
 
-got_block:
+got_block://获得到块信息
 
 	if (mode == BUF_GET_IF_IN_POOL || mode == BUF_PEEK_IF_IN_POOL) {
 
@@ -4601,7 +4601,7 @@ got_block:
 	ut_a(buf_block_get_state(fix_block) == BUF_BLOCK_FILE_PAGE);
 #endif /* UNIV_DEBUG || UNIV_BUF_DEBUG */
 
-	/* We have to wait here because the IO_READ state was set
+	/* We have to wait here because the IO_READ state was set              因为在hash_lock的保护和互斥量下，IO_READ状态被设置。这个方法会进入等待状态
 	under the protection of the hash_lock and not the block->mutex
 	and block->lock. */
 	buf_wait_for_read(fix_block);

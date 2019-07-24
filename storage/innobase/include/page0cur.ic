@@ -71,7 +71,7 @@ page_cur_get_page_zip(
 }
 
 /*********************************************************//**
-Gets the record where the cursor is positioned.
+Gets the record where the cursor is positioned. 从游标的位置中获得行记录信息
 @return record */
 UNIV_INLINE
 rec_t*

@@ -1049,7 +1049,7 @@ dict_tf_get_page_size(
 	return(page_size_t(zip_size, univ_page_size.logical(), true));
 }
 
-/** Get the table page size.
+/** Get the table page size.//获得页的长度
 @param[in]	table	table
 @return a structure containing the compressed and uncompressed
 page sizes and a boolean indicating if the page is compressed */

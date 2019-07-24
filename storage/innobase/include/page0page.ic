@@ -40,7 +40,7 @@ Created 2/2/1994 Heikki Tuuri
 #endif
 
 /************************************************************//**
-Gets the start of a page.
+Gets the start of a page.     获得一个页的状态
 @return start of the page */
 UNIV_INLINE
 page_t*
@@ -318,7 +318,7 @@ page_rec_get_heap_no(
 }
 
 /************************************************************//**
-Determine whether the page is a B-tree leaf.
+Determine whether the page is a B-tree leaf.                  判断页是否为B树的页节点
 @return true if the page is a B-tree leaf (PAGE_LEVEL = 0) */
 UNIV_INLINE
 bool

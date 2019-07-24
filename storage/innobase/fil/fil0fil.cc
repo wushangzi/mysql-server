@@ -1483,7 +1483,7 @@ fil_space_get_space(
 
 	ut_ad(fil_system);
 
-	space = fil_space_get_by_id(id);
+	space = fil_space_get_by_id(id);//根据id获得空间的对象
 	if (space == NULL || space->size != 0) {
 		return(space);
 	}
@@ -1700,8 +1700,8 @@ fil_space_close(
 	mutex_exit(&fil_system->mutex);
 }
 
-/** Returns the page size of the space and whether it is compressed or not.
-The tablespace must be cached in the memory cache.
+/** Returns the page size of the space and whether it is compressed or not.   返回空闲页的长度并且不管它是不是压缩格式的页
+The tablespace must be cached in the memory cache.                            这个表空间必须被缓存在内存中
 @param[in]	id	space id
 @param[out]	found	true if tablespace was found
 @return page size */
@@ -1710,7 +1710,7 @@ fil_space_get_page_size(
 	ulint	id,
 	bool*	found)
 {
-	const ulint	flags = fil_space_get_flags(id);
+	const ulint	flags = fil_space_get_flags(id);//根据id获得空间的id
 
 	if (flags == ULINT_UNDEFINED) {
 		*found = false;

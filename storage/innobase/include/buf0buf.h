@@ -2161,8 +2161,8 @@ struct buf_pool_t{
 	buf_buddy_stat_t buddy_stat[BUF_BUDDY_SIZES_MAX + 1];
 					/*!< Statistics of buddy system,
 					indexed by block size */
-	buf_pool_stat_t	stat;		/*!< current statistics */
-	buf_pool_stat_t	old_stat;	/*!< old statistics */
+	buf_pool_stat_t	stat;		/*!< current statistics 当前统计数字状态*/
+	buf_pool_stat_t	old_stat;	/*!< old statistics     老的统计数字状态*/
 
 	/* @} */
 

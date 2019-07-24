@@ -239,19 +239,19 @@ rec_get_n_extern_new(
 }
 
 /******************************************************//**
-Determine the offset to each field in a leaf-page record
-in ROW_FORMAT=COMPACT.  This is a special case of
+Determine the offset to each field in a leaf-page record  确认在叶页记录中每一个字段偏移量。
+in ROW_FORMAT=COMPACT.  This is a special case of         在行格式为COMPACT时，
 rec_init_offsets() and rec_get_offsets_func(). */
 UNIV_INLINE MY_ATTRIBUTE((nonnull))
 void
 rec_init_offsets_comp_ordinary(
 /*===========================*/
-	const rec_t*		rec,	/*!< in: physical record in
+	const rec_t*		rec,	/*!< in: physical record in   //行格式是COMPACT的信息
 					ROW_FORMAT=COMPACT */
 	bool			temp,	/*!< in: whether to use the
 					format for temporary files in
 					index creation */
-	const dict_index_t*	index,	/*!< in: record descriptor */
+	const dict_index_t*	index,	/*!< in: record descriptor    记录描述符*/
 	ulint*			offsets)/*!< in/out: array of offsets;
 					in: n=rec_offs_n_fields(offsets) */
 {
@@ -529,7 +529,7 @@ resolved:
 }
 
 /******************************************************//**
-The following function determines the offsets to each field
+The following function determines the offsets to each field    这个函数用来在记录中每一个字段的偏移
 in the record.	It can reuse a previously returned array.
 @return the new offsets */
 ulint*
