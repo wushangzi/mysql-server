@@ -370,7 +370,7 @@ fil_write(
 		      byte_offset, len, buf, NULL));
 }
 
-/*******************************************************************//**
+/*******************************************************************//**根据表id获取表空间的信息
 Returns the table space by a given id, NULL if not found. */
 UNIV_INLINE
 fil_space_t*
@@ -381,11 +381,24 @@ fil_space_get_by_id(
 	fil_space_t*	space;
 
 	ut_ad(mutex_own(&fil_system->mutex));
-
-	HASH_SEARCH(hash, fil_system->spaces, id,
+    //堆表空间进行hash搜索
+	/*HASH_SEARCH(hash, fil_system->spaces, id,
 		    fil_space_t*, space,
 		    ut_ad(space->magic_n == FIL_SPACE_MAGIC_N),
-		    space->id == id);
+		    space->id == id);*/
+
+    /*分析全局hash 搜索出对应的hash数据*/
+	(space) = (fil_space_t*) (hash_get_nth_cell(fil_system->spaces, hash_calc_hash(id, fil_system->spaces))->node);
+	while ((space) != 0) {
+	    if (space->id == id) {
+	    	break;
+	    } else {
+		   (space) = (fil_space_t*) ((space)->hash);
+	    }
+    }
+
+
+
 
 	return(space);
 }
@@ -413,7 +426,7 @@ fil_space_get_by_name(
 	return(space);
 }
 
-/** Look up a tablespace.
+/** Look up a tablespace. //查找一个表，调用者应该已经堆innodb表加了锁
 The caller should hold an InnoDB table lock or a MDL that prevents
 the tablespace from being dropped during the operation,
 or the caller should be in single-threaded crash recovery mode

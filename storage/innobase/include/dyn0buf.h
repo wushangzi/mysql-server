@@ -31,8 +31,8 @@ Created 2013-03-16 Sunny Bains
 #include "mem0mem.h"
 #include "dyn0types.h"
 
-/** Class that manages dynamic buffers. It uses a UT_LIST of
-dyn_buf_t::block_t instances. We don't use STL containers in
+/** Class that manages dynamic buffers. It uses a UT_LIST of        管理动态缓存的雷，它用一个dyn_buf_t::block_t实例
+dyn_buf_t::block_t instances. We don't use STL containers in        的
 order to avoid the overhead of heap calls. Using a custom memory
 allocator doesn't solve the problem either because we have to get
 the memory from somewhere. We can't use the block_t::m_data as the

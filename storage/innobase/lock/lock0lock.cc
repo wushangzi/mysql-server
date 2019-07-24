@@ -3980,7 +3980,7 @@ lock_table_other_has_incompatible(
 	return(NULL);
 }
 
-/*********************************************************************//**
+/*********************************************************************//**锁指定的数据库表，如果这个锁不能立即生效，那么这个查询线程会等待
 Locks the specified database table in the mode given. If the lock cannot
 be granted immediately, the query thread is put to wait.
 @return DB_SUCCESS, DB_LOCK_WAIT, DB_DEADLOCK, or DB_QUE_THR_SUSPENDED */

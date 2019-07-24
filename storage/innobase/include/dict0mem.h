@@ -853,7 +853,7 @@ public:
 system clustered index when there is no primary key. */
 const char innobase_index_reserve_name[] = "GEN_CLUST_INDEX";
 
-/** Data structure for an index.  Most fields will be
+/** Data structure for an index.  Most fields will be //一个索引的的结构信息
 initialized to 0, NULL or FALSE in dict_mem_index_create(). */
 struct dict_index_t{
 	index_id_t	id;	/*!< id of the index */
@@ -1315,7 +1315,7 @@ if table->memcached_sync_count == DICT_TABLE_IN_DDL means there's DDL running on
 the table, DML from memcached will be blocked. */
 #define DICT_TABLE_IN_DDL -1
 
-/** Data structure for a database table.  Most fields will be
+/** Data structure for a database table.  Most fields will be 数据库表的结构体，大部分字段会被设置成0，空或者false。
 initialized to 0, NULL or FALSE in dict_mem_table_create(). */
 struct dict_table_t {
 

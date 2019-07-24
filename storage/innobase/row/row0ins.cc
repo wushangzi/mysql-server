@@ -2430,8 +2430,8 @@ row_ins_must_modify_rec(
 	       && !page_rec_is_infimum(btr_cur_get_rec(cursor)));
 }
 
-/***************************************************************//**
-Tries to insert an entry into a clustered index, ignoring foreign key
+/***************************************************************//** 将一个索引项插入到一个聚簇索引中，忽略它的外键检测
+Tries to insert an entry into a clustered index, ignoring foreign key 如果有一个相同的唯一键被发现，
 constraints. If a record with the same unique key is found, the other
 record is necessarily marked deleted by a committed transaction, or a
 unique key violation error occurs. The delete marked record is then
@@ -2465,7 +2465,7 @@ row_ins_clust_index_entry_low(
 	mem_heap_t*	offsets_heap	= NULL;
 	ulint           offsets_[REC_OFFS_NORMAL_SIZE];
 	ulint*          offsets         = offsets_;
-	rec_offs_init(offsets_);
+	rec_offs_init(offsets_);//对offsets_的值进行初始化
 
 	DBUG_ENTER("row_ins_clust_index_entry_low");
 
@@ -2475,7 +2475,7 @@ row_ins_clust_index_entry_low(
 	ut_ad(!n_uniq || n_uniq == dict_index_get_n_unique(index));
 	ut_ad(!thr_get_trx(thr)->in_rollback);
 
-	mtr_start(&mtr);
+	mtr_start(&mtr);//事务开始
 	mtr.set_named_space(index->space);
 
 	if (dict_table_is_temporary(index->table)) {
@@ -2498,7 +2498,7 @@ row_ins_clust_index_entry_low(
 
 	/* Note that we use PAGE_CUR_LE as the search mode, because then
 	the function will return in both low_match and up_match of the
-	cursor sensible values */
+	cursor sensible values */ /*我们使用PAGE_CUR_LE作为搜索模式，因为这个函数会返回底部和顶部的游标*/
 	btr_pcur_open(index, entry, PAGE_CUR_LE, mode, &pcur, &mtr);
 	cursor = btr_pcur_get_btr_cur(&pcur);
 	cursor->thr = thr;
@@ -3233,7 +3233,7 @@ row_ins_index_entry_big_rec_func(
 }
 
 /***************************************************************//**
-Inserts an entry into a clustered index. Tries first optimistic,
+Inserts an entry into a clustered index. Tries first optimistic, //将一个索引项插入到聚集索引中
 then pessimistic descent down the tree. If the entry matches enough
 to a delete marked record, performs the insert by updating or delete
 unmarking the delete marked record.
@@ -3263,13 +3263,13 @@ row_ins_clust_index_entry(
 		}
 	}
 
-	n_uniq = dict_index_is_unique(index) ? index->n_uniq : 0;
+	n_uniq = dict_index_is_unique(index) ? index->n_uniq : 0;//是否是唯一键
 
-	/* Try first optimistic descent to the B-tree */
+	/* Try first optimistic descent to the B-tree *///尝试第一次使用乐观锁倒序到b树中
 	ulint	flags;
 
-	if (!dict_table_is_intrinsic(index->table)) {
-		log_free_check();
+	if (!dict_table_is_intrinsic(index->table)) {//不是内部表
+		log_free_check();//数据进行操作时需要调用这个方法进行
 		flags = dict_table_is_temporary(index->table)
 			? BTR_NO_LOCKING_FLAG
 			: 0;
@@ -3288,7 +3288,7 @@ row_ins_clust_index_entry(
 		err = row_ins_sorted_clust_index_entry(
 			BTR_MODIFY_LEAF, index, entry, n_ext, thr);
 	} else {
-		err = row_ins_clust_index_entry_low(
+		err = row_ins_clust_index_entry_low(//调用底层插入函数
 			flags, BTR_MODIFY_LEAF, index, n_uniq, entry,
 			n_ext, thr, dup_chk_only);
 	}
@@ -3406,7 +3406,7 @@ row_ins_sec_index_entry(
 }
 
 /***************************************************************//**
-Inserts an index entry to index. Tries first optimistic, then pessimistic
+Inserts an index entry to index. Tries first optimistic, then pessimistic 将一个索引条目插入索引中，首次尝试乐观锁，
 descent down the tree. If the entry matches enough to a delete marked record,
 performs the insert by updating or delete unmarking the delete marked
 record.
@@ -3425,9 +3425,9 @@ row_ins_index_entry(
 			DBUG_SET("-d,row_ins_index_entry_timeout");
 			return(DB_LOCK_WAIT);});
 
-	if (dict_index_is_clust(index)) {
+	if (dict_index_is_clust(index)) {//索引树是否为聚簇索引
 		return(row_ins_clust_index_entry(index, entry, thr, 0, false));
-	} else {
+	} else {//索引树未非聚簇索引
 		return(row_ins_sec_index_entry(index, entry, thr, false));
 	}
 }
@@ -3477,7 +3477,7 @@ row_ins_index_entry_set_vals(
 {
 	ulint	n_fields;
 	ulint	i;
-	ulint	num_v = dtuple_get_n_v_fields(entry);
+	ulint	num_v = dtuple_get_n_v_fields(entry);//获得虚拟列
 
 	n_fields = dtuple_get_n_fields(entry);
 
@@ -3552,7 +3552,7 @@ row_ins_index_entry_set_vals(
 }
 
 /***********************************************************//**
-Inserts a single index entry to the table.
+Inserts a single index entry to the table.//向表中插入一条记录
 @return DB_SUCCESS if operation successfully completed, else error
 code or DB_LOCK_WAIT */
 static MY_ATTRIBUTE((nonnull, warn_unused_result))
@@ -3567,7 +3567,7 @@ row_ins_index_entry_step(
 	DBUG_ENTER("row_ins_index_entry_step");
 
 	ut_ad(dtuple_check_typed(node->row));
-
+    //将需要插入的数据的值进行赋值
 	err = row_ins_index_entry_set_vals(node->index, node->entry, node->row);
 
 	if (err != DB_SUCCESS) {
@@ -3575,7 +3575,7 @@ row_ins_index_entry_step(
 	}
 
 	ut_ad(dtuple_check_typed(node->entry));
-
+    //将索引项插入到索引树中
 	err = row_ins_index_entry(node->index, node->entry, thr);
 
 	DEBUG_SYNC_C_IF_THD(thr_get_trx(thr)->mysql_thd,
@@ -3584,7 +3584,7 @@ row_ins_index_entry_step(
 	DBUG_RETURN(err);
 }
 
-/***********************************************************//**
+/***********************************************************//**为一行分配一个行id并初始化索引字段
 Allocates a row id for row and inits the node->index field. */
 UNIV_INLINE
 void
@@ -3610,7 +3610,7 @@ row_ins_alloc_row_id_step(
 	dict_sys_write_row_id(node->row_id_buf, row_id);
 }
 
-/***********************************************************//**
+/***********************************************************//** 从 insert into ....values() 中获得行的链表
 Gets a row to insert from the values list. */
 UNIV_INLINE
 void
@@ -3643,7 +3643,7 @@ row_ins_get_row_from_values(
 	}
 }
 
-/***********************************************************//**
+/***********************************************************//**用select 链表中获得插入的行
 Gets a row to insert from the select list. */
 UNIV_INLINE
 void
@@ -3729,9 +3729,9 @@ row_ins(
 				DBUG_RETURN(err);
 			}
 		}
-
+        //获取下一个index
 		node->index = dict_table_get_next_index(node->index);
-		node->entry = UT_LIST_GET_NEXT(tuple_list, node->entry);
+		node->entry = UT_LIST_GET_NEXT(tuple_list, node->entry);//获取下一个entry
 
 		DBUG_EXECUTE_IF(
 			"row_ins_skip_sec",
@@ -3818,7 +3818,7 @@ row_ins_step(
 
 			goto same_trx;
 		}
-
+        //进行锁表，增加一个表的意向锁
 		err = lock_table(0, node->table, LOCK_IX, thr);
 
 		DBUG_EXECUTE_IF("ib_row_ins_ix_lock_wait",

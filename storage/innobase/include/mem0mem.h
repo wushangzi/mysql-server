@@ -364,11 +364,11 @@ mem_heap_validate(
 
 #endif /* UNIV_DEBUG */
 
-/*#######################################################################*/
-
+/*#######################################################################
+blob 块的内存信息*/
 /** The info structure stored at the beginning of a heap block */
 struct mem_block_info_t {
-	ulint	magic_n;/* magic number for debugging */
+	ulint	magic_n;/* magic number for debugging  调式使用的魔术号 */
 #ifdef UNIV_DEBUG
 	char	file_name[8];/* file name where the mem heap was created */
 	ulint	line;	/*!< line number where the mem heap was created */
@@ -380,15 +380,15 @@ struct mem_block_info_t {
 			and prev in the list. The first block allocated
 			to the heap is also the first block in this list,
 			though it also contains the base node of the list. */
-	ulint	len;	/*!< physical length of this block in bytes */
-	ulint	total_size; /*!< physical length in bytes of all blocks
-			in the heap. This is defined only in the base
+	ulint	len;	/*!< physical length of this block in bytes  物理块的行长度*/
+	ulint	total_size; /*!< physical length in bytes of all blocks  内存堆中所有block块的物理长度
+			in the heap. This is defined only in the base            它仅仅在基础节点中被定义。
 			node and is set to ULINT_UNDEFINED in others. */
-	ulint	type;	/*!< type of heap: MEM_HEAP_DYNAMIC, or
+	ulint	type;	/*!< type of heap: MEM_HEAP_DYNAMIC, or      堆类型，MEM_HEAP_BUF，MEM_HEAP_DYNAMIC与MEM_HEAP_BTR_SEARCH中进行异或操作
 			MEM_HEAP_BUF possibly ORed to MEM_HEAP_BTR_SEARCH */
-	ulint	free;	/*!< offset in bytes of the first free position for
+	ulint	free;	/*!< offset in bytes of the first free position for  块中最近的偏移空闲位置
 			user data in the block */
-	ulint	start;	/*!< the value of the struct field 'free' at the
+	ulint	start;	/*!< the value of the struct field 'free' at the   块中，free字段对应的起始位置
 			creation of the block */
 #ifndef UNIV_HOTBACKUP
 	void*	free_block;

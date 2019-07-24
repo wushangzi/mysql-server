@@ -44,12 +44,12 @@ typedef void*	hash_node_t;
 method used for it. */
 enum hash_table_sync_t {
 	HASH_TABLE_SYNC_NONE = 0,	/*!< Don't use any internal
-					synchronization objects for
+					synchronization objects for 不用任何内部同步对象
 					this hash_table. */
 	HASH_TABLE_SYNC_MUTEX,		/*!< Use mutexes to control
-					access to this hash_table. */
+					access to this hash_table. 用护持量进行同步 */
 	HASH_TABLE_SYNC_RW_LOCK		/*!< Use rw_locks to control
-					access to this hash_table. */
+					access to this hash_table. 用读写锁进行同步控制*/
 };
 
 /*************************************************************//**
@@ -530,9 +530,9 @@ struct hash_cell_t{
 	void*	node;	/*!< hash chain node, NULL if none */
 };
 
-/* The hash table structure */
+/* The hash table structure hash表的结构定义 */
 struct hash_table_t {
-	enum hash_table_sync_t	type;	/*<! type of hash_table. */
+	enum hash_table_sync_t	type;	/*<! type of hash_table. hash表的类型 */
 #if defined UNIV_AHI_DEBUG || defined UNIV_DEBUG
 # ifndef UNIV_HOTBACKUP
 	ibool			adaptive;/* TRUE if this is the hash

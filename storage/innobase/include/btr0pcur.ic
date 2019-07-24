@@ -414,8 +414,8 @@ btr_pcur_free(
 }
 
 /**************************************************************//**
-Initializes and opens a persistent cursor to an index tree. It should be
-closed with btr_pcur_close. */
+Initializes and opens a persistent cursor to an index tree. It should be 初始化并打开一个在索引树中连续的游标，它通过
+closed with btr_pcur_close.                                              调用btr_pcur_close进行关闭*/
 UNIV_INLINE
 void
 btr_pcur_open_low(
@@ -437,16 +437,16 @@ btr_pcur_open_low(
 {
 	btr_cur_t*	btr_cursor;
 
-	/* Initialize the cursor */
 
+	/* Initialize the cursor */
 	btr_pcur_init(cursor);
 
-	cursor->latch_mode = BTR_LATCH_MODE_WITHOUT_FLAGS(latch_mode);
-	cursor->search_mode = mode;
+	cursor->latch_mode = BTR_LATCH_MODE_WITHOUT_FLAGS(latch_mode);/*设置排他锁*/
+	cursor->search_mode = mode;/*设置查询模式*/
+
 
 	/* Search with the tree cursor */
-
-	btr_cursor = btr_pcur_get_btr_cur(cursor);
+	btr_cursor = btr_pcur_get_btr_cur(cursor);//cursor->btr_cur
 
 	ut_ad(!dict_index_is_spatial(index));
 
@@ -460,7 +460,7 @@ btr_pcur_open_low(
 			(((latch_mode & BTR_MODIFY_LEAF)
 			 || (latch_mode & BTR_MODIFY_TREE)) ? true : false));
 	} else {
-		btr_cur_search_to_nth_level(
+		btr_cur_search_to_nth_level(/*通过给定深度的索引树的二叉树搜索*/
 			index, level, tuple, mode, latch_mode,
 			btr_cursor, 0, file, line, mtr);
 	}

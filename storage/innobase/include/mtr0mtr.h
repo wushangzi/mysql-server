@@ -347,7 +347,7 @@ struct mtr_t {
 		if (space_id == TRX_SYS_SPACE) {
 			return(set_sys_modified());
 		} else {
-			lookup_user_space(space_id);
+			lookup_user_space(space_id);//查找用户空间
 			return(m_impl.m_user_space);
 		}
 	}
@@ -602,10 +602,10 @@ private:
 	Impl			m_impl;
 
 	/** LSN at commit time */
-	volatile lsn_t		m_commit_lsn;
+	volatile lsn_t		m_commit_lsn;//日志序列号
 
 	/** true if it is synchronous mini-transaction */
-	bool			m_sync;
+	bool			m_sync;//
 };
 
 #ifndef UNIV_NONINL

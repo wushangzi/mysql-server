@@ -4037,7 +4037,7 @@ buf_wait_for_read(
 		}
 	}
 }
-
+/*这个常规函数用于获得数据库的页*/
 /** This is the general function used to get access to a database page.
 @param[in]	page_id		page id
 @param[in]	rw_latch	RW_S_LATCH, RW_X_LATCH, RW_NO_LATCH
@@ -4130,10 +4130,10 @@ loop:
 		}
 	}
 
-	if (block == NULL) {
+	if (block == NULL) {//获得块数据
 		block = (buf_block_t*) buf_page_hash_get_low(buf_pool, page_id);
 	}
-
+    //查看块是否存在监视
 	if (!block || buf_pool_watch_is_sentinel(buf_pool, &block->page)) {
 		rw_lock_s_unlock(hash_lock);
 		block = NULL;

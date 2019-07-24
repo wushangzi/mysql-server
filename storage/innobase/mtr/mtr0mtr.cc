@@ -725,7 +725,7 @@ mtr_t::lookup_sys_space()
 	ut_ad(m_impl.m_sys_space);
 }
 
-/** Look up the user tablespace.
+/** Look up the user tablespace. 根据空间id查找用户空间
 @param[in]	space_id	tablespace ID */
 void
 mtr_t::lookup_user_space(ulint space_id)

@@ -996,7 +996,7 @@ buf_block_buf_fix_dec(
 	}
 #endif /* UNIV_DEBUG */
 }
-
+/*通过页的id在缓存池中获得实例 它会根据表空间id和页的id获取到缓存块的id指针*/
 /** Returns the buffer pool instance given a page id.
 @param[in]	page_id	page id
 @return buffer pool */
@@ -1006,7 +1006,7 @@ buf_pool_get(
 	const page_id_t&	page_id)
 {
         /* 2log of BUF_READ_AHEAD_AREA (64) */
-        ulint		ignored_page_no = page_id.page_no() >> 6;
+        ulint		ignored_page_no = page_id.page_no() >> 6;/*忽略的块*/
 
         page_id_t	id(page_id.space(), ignored_page_no);
 
@@ -1029,7 +1029,7 @@ buf_pool_from_array(
 	ut_ad(index < srv_buf_pool_instances);
 	return(&buf_pool_ptr[index]);
 }
-
+/*获得一个文件页的控制块*/
 /** Returns the control block of a file page, NULL if not found.
 @param[in]	buf_pool	buffer pool instance
 @param[in]	page_id		page id
@@ -1051,7 +1051,7 @@ buf_page_hash_get_low(
 #endif /* UNIV_DEBUG */
 
 	/* Look for the page in the hash table */
-
+    //搜索对应的hash块
 	HASH_SEARCH(hash, buf_pool->page_hash, page_id.fold(), buf_page_t*,
 		    bpage,
 		    ut_ad(bpage->in_page_hash && !bpage->in_zip_hash
@@ -1065,7 +1065,7 @@ buf_page_hash_get_low(
 	}
 
 	return(bpage);
-}
+};
 
 /** Returns the control block of a file page, NULL if not found.
 If the block is found and lock is not NULL then the appropriate
@@ -1150,7 +1150,7 @@ unlock_and_exit:
 	}
 exit:
 	return(bpage);
-}
+};
 
 /** Returns the control block of a file page, NULL if not found.
 If the block is found and lock is not NULL then the appropriate

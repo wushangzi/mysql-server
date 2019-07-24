@@ -88,7 +88,7 @@ hash_calc_hash(
 #ifndef UNIV_HOTBACKUP
 /************************************************************//**
 Gets the sync object index for a fold value in a hash table.
-@return index */
+@return index *//*通过一个在hash表中的fold值获得同步对象索引*/
 UNIV_INLINE
 ulint
 hash_get_sync_obj_index(
@@ -218,9 +218,9 @@ hash_get_lock(
 	ut_ad(table->type == HASH_TABLE_SYNC_RW_LOCK);
 	ut_ad(table->magic_n == HASH_TABLE_MAGIC_N);
 
-	i = hash_get_sync_obj_index(table, fold);
+	i = hash_get_sync_obj_index(table, fold);//获得对象块id
 
-	return(hash_get_nth_lock(table, i));
+	return(hash_get_nth_lock(table, i));//获得指定块id的读写锁
 }
 
 /** If not appropriate rw_lock for a fold value in a hash table,

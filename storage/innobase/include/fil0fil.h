@@ -132,10 +132,10 @@ fil_type_is_data(
 
 struct fil_node_t;
 
-/** Tablespace or log data space */
+/** Tablespace or log data space 表空间或者日志数据空间 */
 struct fil_space_t {
-	char*		name;	/*!< Tablespace name */
-	ulint		id;	/*!< space id */
+	char*		name;	/*!< Tablespace name 空间名 */
+	ulint		id;	/*!< space id 空间id*/
 	lsn_t		max_lsn;
 				/*!< LSN of the most recent
 				fil_names_write_if_was_clean().
@@ -143,12 +143,12 @@ struct fil_space_t {
 				Protected by log_sys->mutex.
 				If and only if this is nonzero, the
 				tablespace will be in named_spaces. */
-	bool		stop_ios;/*!< true if we want to rename the
+	bool		stop_ios;/*!< true if we want to rename the 如果是真，我们想要重命名.idb未见或者表空间
 				.ibd file of tablespace and want to
 				stop temporarily posting of new i/o
 				requests on the file */
 	bool		stop_new_ops;
-				/*!< we set this true when we start
+				/*!< we set this true when we start   当我们对简单表进行删除，我们需要把它设置为true
 				deleting a single-table tablespace.
 				When this is set following new ops
 				are not allowed:
@@ -172,7 +172,7 @@ struct fil_space_t {
 	fil_type_t	purpose;/*!< purpose */
 	UT_LIST_BASE_NODE_T(fil_node_t) chain;
 				/*!< base node for the file chain */
-	ulint		size;	/*!< tablespace file size in pages;
+	ulint		size;	/*!< tablespace file size in pages; 表空间在page页的长度
 				0 if not known yet */
 	ulint		size_in_header;
 				/* FSP_SIZE in the tablespace header;
@@ -206,7 +206,7 @@ struct fil_space_t {
 #endif /* !UNIV_HOTBACKUP */
 	UT_LIST_NODE_T(fil_space_t) unflushed_spaces;
 				/*!< list of spaces with at least one unflushed
-				file we have written to */
+				file we have written to 未刷新文件 */
 	UT_LIST_NODE_T(fil_space_t) named_spaces;
 				/*!< list of spaces for which MLOG_FILE_NAME
 				records have been issued */
@@ -214,22 +214,22 @@ struct fil_space_t {
 				/*!< true if this space is currently in
 				unflushed_spaces */
 	UT_LIST_NODE_T(fil_space_t) space_list;
-				/*!< list of all spaces */
+				/*!< list of all spaces 所有的空间链表 */
 
 	/** Compression algorithm */
-	Compression::Type	compression_type;
+	Compression::Type	compression_type;//压缩算法
 
 	/** Encryption algorithm */
-	Encryption::Type	encryption_type;
+	Encryption::Type	encryption_type;//加密算法
 
 	/** Encrypt key */
-	byte			encryption_key[ENCRYPTION_KEY_LEN];
+	byte			encryption_key[ENCRYPTION_KEY_LEN];//加密键
 
 	/** Encrypt key length*/
-	ulint			encryption_klen;
+	ulint			encryption_klen;//加密键的长度
 
 	/** Encrypt initial vector */
-	byte			encryption_iv[ENCRYPTION_KEY_LEN];
+	byte			encryption_iv[ENCRYPTION_KEY_LEN];//
 
 	/** Release the reserved free extents.
 	@param[in]	n_reserved	number of reserved extents */

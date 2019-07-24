@@ -710,16 +710,16 @@ btr_cur_need_opposite_intention(
 }
 
 /********************************************************************//**
-Searches an index tree and positions a tree cursor on a given level.
-NOTE: n_fields_cmp in tuple must be set so that it cannot be compared
-to node pointer page number fields on the upper levels of the tree!
-Note that if mode is PAGE_CUR_LE, which is used in inserts, then
-cursor->up_match and cursor->low_match both will have sensible values.
-If mode is PAGE_CUR_GE, then up_match will a have a sensible value.
+Searches an index tree and positions a tree cursor on a given level.         查询一棵索引树并定位一个给定等级的树游标
+NOTE: n_fields_cmp in tuple must be set so that it cannot be compared     注意：tuple中的n_fields_cmp必须被设置它
+to node pointer page number fields on the upper levels of the tree!           无法与树的上层的节点指针页码字段进行比较
+Note that if mode is PAGE_CUR_LE, which is used in inserts, then          注意：假如mode是PAGE_CUR_LE，那么是用来进行插入，那么
+cursor->up_match and cursor->low_match both will have sensible values.    cursor->up_match and cursor->low_match都要有合理的值
+If mode is PAGE_CUR_GE, then up_match will a have a sensible value.       假如mode变量是，那么PAGE_CUR_GEup_match会有一个合理的值
 
-If mode is PAGE_CUR_LE , cursor is left at the place where an insert of the
-search tuple should be performed in the B-tree. InnoDB does an insert
-immediately after the cursor. Thus, the cursor may end up on a user record,
+If mode is PAGE_CUR_LE , cursor is left at the place where an insert of the   假如mode是PAGE_CUR_LE，那么cursor应该在一条数据插入到
+search tuple should be performed in the B-tree. InnoDB does an insert      索引树中左侧的位置，InnoDB会在去定cursor之后立即进行插入操作，因此
+immediately after the cursor. Thus, the cursor may end up on a user record, 这个游标可能在一条记录终结，或者在一个页中的下界记录
 or on a page infimum record. */
 void
 btr_cur_search_to_nth_level(
@@ -767,7 +767,7 @@ btr_cur_search_to_nth_level(
 	page_cur_mode_t	search_mode = PAGE_CUR_UNSUPP;
 	ulint		buf_mode;
 	ulint		estimate;
-	ulint		node_ptr_max_size = UNIV_PAGE_SIZE / 2;
+	ulint		node_ptr_max_size = UNIV_PAGE_SIZE / 2;//8KB
 	page_cur_t*	page_cursor;
 	btr_op_t	btr_op;
 	ulint		root_height = 0; /* remove warning */
@@ -835,8 +835,8 @@ btr_cur_search_to_nth_level(
 					   MTR_MEMO_S_LOCK
 					   | MTR_MEMO_SX_LOCK));
 
-	/* These flags are mutually exclusive, they are lumped together
-	with the latch mode for historical reasons. It's possible for
+	/* These flags are mutually exclusive, they are lumped together    这个标志是互不相容的，这是把latch model归并
+	with the latch mode for historical reasons. It's possible for      在一起的历史原因。它可能会被设置为none
 	none of the flags to be set. */
 	switch (UNIV_EXPECT(latch_mode
 			    & (BTR_INSERT | BTR_DELETE | BTR_DELETE_MARK),
@@ -894,7 +894,7 @@ btr_cur_search_to_nth_level(
 	guess = NULL;
 #else
 	info = btr_search_get_info(index);
-
+    //判断缓存池是否过期
 	if (!buf_pool_is_obsolete(info->withdraw_clock)) {
 		guess = info->root_guess;
 	} else {
@@ -1025,7 +1025,7 @@ btr_cur_search_to_nth_level(
 	/* Start with the root page. */
 	page_id_t		page_id(space, dict_index_get_page(index));
 
-	if (root_leaf_rw_latch == RW_X_LATCH) {
+	if (root_leaf_rw_latch == RW_X_LATCH) {//计算行的最大长度
 		node_ptr_max_size = dict_index_node_ptr_max_size(index);
 	}
 
