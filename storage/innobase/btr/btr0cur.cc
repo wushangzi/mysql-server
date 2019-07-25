@@ -1020,7 +1020,7 @@ btr_cur_search_to_nth_level(
 	page_cursor = btr_cur_get_page_cur(cursor);//cursor->page_cur
 
 	const ulint		space = dict_index_get_space(index);//index->space
-	const page_size_t	page_size(dict_table_page_size(index->table));
+	const page_size_t	page_size(dict_table_page_size(index->table));//获取页大小信息
 
 	/* Start with the root page. */
 	page_id_t		page_id(space, dict_index_get_page(index));

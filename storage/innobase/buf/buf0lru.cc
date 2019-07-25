@@ -1154,8 +1154,8 @@ buf_LRU_buf_pool_running_out(void)
 }
 
 /******************************************************************//**
-Returns a free block from the buf_pool.  The block is taken off the
-free list.  If it is empty, returns NULL.
+Returns a free block from the buf_pool.  The block is taken off the               从缓存实例中返回一个free block.这个块是free list的开始位置的块，
+free list.  If it is empty, returns NULL.                                         如果为空，返回null
 @return a free control block, or NULL if the buf_block->free list is empty */
 buf_block_t*
 buf_LRU_get_free_only(
@@ -1280,33 +1280,33 @@ buf_LRU_check_size_of_non_data_objects(
 }
 
 /******************************************************************//**
-Returns a free block from the buf_pool. The block is taken off the
-free list. If free list is empty, blocks are moved from the end of the
+Returns a free block from the buf_pool. The block is taken off the       从缓存池中返回一个自由的block块，这个块在free list中被分配
+free list. If free list is empty, blocks are moved from the end of the   假如这个free list块是空的，块从LRU最后的块中移动到free list
 LRU list to the free list.
-This function is called from a user thread when it needs a clean
-block to read in a page. Note that we only ever get a block from
-the free list. Even when we flush a page or find a page in LRU scan
+This function is called from a user thread when it needs a clean         这个方法会从一个用户线程中调用当它需要一个干净的块的页去读。注意：
+block to read in a page. Note that we only ever get a block from         我们仅仅智慧从free list中去获取块，即使我们刷新一个页或者在LRU扫描
+the free list. Even when we flush a page or find a page in LRU scan      中找到一个页，我们也会将它放到free list中去使用
 we put it to free list to be used.
-* iteration 0:
-  * get a block from free list, success:done
-  * if buf_pool->try_LRU_scan is set
-    * scan LRU up to srv_LRU_scan_depth to find a clean block
-    * the above will put the block on free list
-    * success:retry the free list
-  * flush one dirty page from tail of LRU to disk
-    * the above will put the block on free list
-    * success: retry the free list
-* iteration 1:
-  * same as iteration 0 except:
-    * scan whole LRU list
-    * scan LRU list even if buf_pool->try_LRU_scan is not set
-* iteration > 1:
-  * same as iteration 1 but sleep 10ms
-@return the free control block, in state BUF_BLOCK_READY_FOR_USE */
+* iteration 0:                                                           第0次迭代
+  * get a block from free list, success:done                                从free list中获得一个块，成功则完成
+  * if buf_pool->try_LRU_scan is set                                        假如buf_pool->try_LRU_scan 设置
+    * scan LRU up to srv_LRU_scan_depth to find a clean block                  1）扫描LRU直到srv_LRU_scan_depth去找一个干净的块
+    * the above will put the block on free list                                2）根据上述情况将把这个块放入free list中
+    * success:retry the free list                                              3）成功：重新进入free list
+  * flush one dirty page from tail of LRU to disk                           从LRU的头中刷新一个脏页到磁盘中
+    * the above will put the block on free list                                1）根据上述情况将把这个块放入free list中
+    * success: retry the free list                                             2）成功：重新进入free list
+* iteration 1:                                                           第1次迭代
+  * same as iteration 0 except:                                              除了下列行为，其他和第0此迭代相同
+    * scan whole LRU list                                                      1）扫描所有LRU列
+    * scan LRU list even if buf_pool->try_LRU_scan is not set                  2）扫描所有的LRU列即使buf_pool->try_LRU_scan没有设置
+* iteration > 1:                                                         1次迭代后
+  * same as iteration 1 but sleep 10ms                                       每次休眠10毫米，其他和第1次一样
+@return the free control block, in state BUF_BLOCK_READY_FOR_USE         返回free 控制块 */
 buf_block_t*
 buf_LRU_get_free_block(
 /*===================*/
-	buf_pool_t*	buf_pool)	/*!< in/out: buffer pool instance */
+	buf_pool_t*	buf_pool)	/*!< in/out: buffer pool instance            线程池的实例   */
 {
 	buf_block_t*	block		= NULL;
 	bool		freed		= false;
@@ -1317,7 +1317,7 @@ buf_LRU_get_free_block(
 
 	MONITOR_INC(MONITOR_LRU_GET_FREE_SEARCH);
 loop:
-	buf_pool_mutex_enter(buf_pool);
+	buf_pool_mutex_enter(buf_pool);//设置互斥量
 
 	buf_LRU_check_size_of_non_data_objects(buf_pool);
 

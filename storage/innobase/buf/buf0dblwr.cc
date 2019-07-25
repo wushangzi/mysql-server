@@ -46,7 +46,7 @@ buf_dblwr_t*	buf_dblwr = NULL;
 ibool	buf_dblwr_being_created = FALSE;
 
 /****************************************************************//**
-Determines if a page number is located inside the doublewrite buffer.
+Determines if a page number is located inside the doublewrite buffer.   确认一个页的number数位于doublewrite缓冲区内
 @return TRUE if the location is inside the two blocks of the
 doublewrite buffer */
 ibool

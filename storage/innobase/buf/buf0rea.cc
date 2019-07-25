@@ -89,7 +89,7 @@ buf_read_page_handle_error(
 	buf_pool_mutex_exit(buf_pool);
 }
 
-/** Low-level function which reads a page asynchronously from a file to the
+/** Low-level function which reads a page asynchronously from a file to the   读取上层封装函数异步从文件中读取到缓存池中。
 buffer buf_pool if it is not already there, in which case does nothing.
 Sets the io_fix flag and sets an exclusive lock on the buffer frame. The
 flag is cleared and the x-lock released by an i/o-handler thread.
@@ -142,9 +142,9 @@ buf_read_page_low(
 		sync = true;
 	}
 
-	/* The following call will also check if the tablespace does not exist
-	or is being dropped; if we succeed in initing the page in the buffer
-	pool for read, then DISCARD cannot proceed until the read has
+	/* The following call will also check if the tablespace does not exist   下列函数的调用也将判断表空间不存在或者被上出
+	or is being dropped; if we succeed in initing the page in the buffer     ，假如我们在初始化这个缓存池中页读取的时候，那么
+	pool for read, then DISCARD cannot proceed until the read has            会丢弃放弃继续直到读取完成
 	completed */
 	bpage = buf_page_init_for_read(err, mode, page_id, page_size, unzip);
 
@@ -421,12 +421,12 @@ read_ahead:
 	return(count);
 }
 
-/** High-level function which reads a page asynchronously from a file to the
-buffer buf_pool if it is not already there. Sets the io_fix flag and sets
-an exclusive lock on the buffer frame. The flag is cleared and the x-lock
+/** High-level function which reads a page asynchronously from a file to the 读取上层封装函数异步从文件中读取到缓存池中。
+buffer buf_pool if it is not already there. Sets the io_fix flag and sets    设置io_fix的标识位并且在缓存块中设置排他锁，通过
+an exclusive lock on the buffer frame. The flag is cleared and the x-lock    i/o-handler thread清除标志位，并且释放排他锁。
 released by the i/o-handler thread.
-@param[in]	page_id		page id
-@param[in]	page_size	page size
+@param[in]	page_id		page id      页的id
+@param[in]	page_size	page size    页的长度
 @return TRUE if page has been read in, FALSE in case of failure */
 ibool
 buf_read_page(

@@ -4141,7 +4141,7 @@ loop:
 
 	if (block == NULL) {
 		/* Page not in buf_pool: needs to be read from file */
-
+        /*数据库不再缓存页中，需要从文件中读取*/
 		if (mode == BUF_GET_IF_IN_POOL_OR_WATCH) {
 			rw_lock_x_lock(hash_lock);
 
@@ -5002,10 +5002,10 @@ buf_page_init_low(
 	ut_d(bpage->file_page_was_freed = FALSE);
 }
 
-/** Inits a page to the buffer buf_pool.
-@param[in,out]	buf_pool	buffer pool
-@param[in]	page_id		page id
-@param[in,out]	block		block to init */
+/** Inits a page to the buffer buf_pool.  从缓存池实例中初始化一个页信息
+@param[in,out]	buf_pool	buffer pool   缓冲池
+@param[in]	page_id		page id           页的id信息
+@param[in,out]	block		block to init 进行初始化的块*/
 static
 void
 buf_page_init(
@@ -5090,12 +5090,12 @@ buf_page_init(
 	}
 }
 
-/** Inits a page for read to the buffer buf_pool. If the page is
-(1) already in buf_pool, or
-(2) if we specify to read only ibuf pages and the page is not an ibuf page, or
-(3) if the space is deleted or being deleted,
-then this function does nothing.
-Sets the io_fix flag to BUF_IO_READ and sets a non-recursive exclusive lock
+/** Inits a page for read to the buffer buf_pool. If the page is             初始化一个页并将它读取到缓存池中，假如
+(1) already in buf_pool, or                                                         1）页已经存在缓冲池，或者
+(2) if we specify to read only ibuf pages and the page is not an ibuf page, or      2）如果我们指定只能读取ibuf pages而且该页不是ibuf pages或者
+(3) if the space is deleted or being deleted,                                       3）空间被删除或者正在被删除
+then this function does nothing.                                             那么这个方法不会做任何事
+Sets the io_fix flag to BUF_IO_READ and sets a non-recursive exclusive lock  将io_fix标识位设置为BUF_IO_READ并且设置一个非递归的排他锁在buffer->frame中。
 on the buffer frame. The io-handler must take care that the flag is cleared
 and the lock released later.
 @param[out]	err			DB_SUCCESS or DB_TABLESPACE_DELETED
@@ -5150,7 +5150,7 @@ buf_page_init_for_read(
 		ut_ad(buf_pool_from_block(block) == buf_pool);
 	}
 
-	buf_pool_mutex_enter(buf_pool);
+	buf_pool_mutex_enter(buf_pool);//块加锁
 
 	hash_lock = buf_page_hash_lock_get(buf_pool, page_id);
 	rw_lock_x_lock(hash_lock);
@@ -5173,7 +5173,7 @@ buf_page_init_for_read(
 	if (block) {
 		bpage = &block->page;
 
-		buf_page_mutex_enter(block);
+		buf_page_mutex_enter(block);//将块增加互斥量
 
 		ut_ad(buf_pool_from_bpage(bpage) == buf_pool);
 

@@ -1505,7 +1505,7 @@ rec_offs_data_size(
 }
 
 /**********************************************************//**
-Returns the total size of record minus data size of record. The value
+Returns the total size of record minus data size of record. The value   返回记录的全部长度
 returned by the function is the distance from record start to record origin
 in bytes.
 @return size */

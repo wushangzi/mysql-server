@@ -2662,7 +2662,7 @@ func_exit:
 		mem_heap_free(offsets_heap);
 	}
 
-	btr_pcur_close(&pcur);
+	btr_pcur_close(&pcur);//释放pcur对象
 
 	DBUG_RETURN(err);
 }

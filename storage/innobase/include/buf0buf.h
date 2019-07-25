@@ -1554,7 +1554,7 @@ for compressed and uncompressed frames */
 
 /** Number of bits used for buffer page states. */
 #define BUF_PAGE_STATE_BITS	3
-
+/*缓存页信息*/
 class buf_page_t {
 public:
 	/** @name General fields
@@ -2055,15 +2055,15 @@ struct buf_buddy_free_t {
  * */
 /** @brief The buffer pool statistics structure. */
 struct buf_pool_stat_t{
-	ulint	n_page_gets;	/*!< number of page gets performed;
-				also successful searches through
-				the adaptive hash index are
-				counted as page gets; this field
+	ulint	n_page_gets;	/*!< number of page gets performed;  也获得执行数
+ 				also successful searches through                 也可以通过
+				the adaptive hash index are                      自适应哈希锁计算
+				counted as page gets; this field                 页的情况
 				is NOT protected by the buffer
 				pool mutex */
-	ulint	n_pages_read;	/*!< number read operations */
-	ulint	n_pages_written;/*!< number write operations */
-	ulint	n_pages_created;/*!< number of pages created
+	ulint	n_pages_read;	/*!< number read operations          页读取数 */
+	ulint	n_pages_written;/*!< number write operations         页写入数 */
+	ulint	n_pages_created;/*!< number of pages created         在缓存中无读取创建的页的数量
 				in the pool with no read */
 	ulint	n_ra_pages_read_rnd;/*!< number of pages read in
 				as part of random read ahead */
@@ -2072,14 +2072,14 @@ struct buf_pool_stat_t{
 	ulint	n_ra_pages_evicted;/*!< number of read ahead
 				pages that are evicted without
 				being accessed */
-	ulint	n_pages_made_young; /*!< number of pages made young, in
+	ulint	n_pages_made_young; /*!< number of pages made young, in  LRU中年轻代页的数量
 				calls to buf_LRU_make_block_young() */
 	ulint	n_pages_not_made_young; /*!< number of pages not made
 				young because the first access
 				was not long enough ago, in
 				buf_page_peek_if_too_old() */
-	ulint	LRU_bytes;	/*!< LRU size in bytes */
-	ulint	flush_list_bytes;/*!< flush_list size in bytes */
+	ulint	LRU_bytes;	/*!< LRU size in bytes                   内存LRU的byte长度*/
+	ulint	flush_list_bytes;/*!< flush_list size in bytes       刷新列表页的字节长度*/
 };
 
 /*根据给定的块的长度统计伙伴页*/

@@ -410,9 +410,9 @@ buf_page_set_flush_type(
 	ut_ad(buf_page_get_flush_type(bpage) == flush_type);
 }
 
-/** Map a block to a file page.
-@param[in,out]	block	pointer to control block
-@param[in]	page_id	page id */
+/** Map a block to a file page.   将一个块隐射到一个文件页
+@param[in,out]	block	pointer to control block  指向控制块
+@param[in]	page_id	page id       页的id信息*/
 UNIV_INLINE
 void
 buf_block_set_file_page(
@@ -1065,7 +1065,7 @@ buf_page_hash_get_low(
 	}
 
 	return(bpage);
-};
+}
 
 /** Returns the control block of a file page, NULL if not found.
 If the block is found and lock is not NULL then the appropriate
