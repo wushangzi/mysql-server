@@ -575,7 +575,7 @@ buf_page_is_old(
 }
 
 /*********************************************************************//**
-Flag a block old. */
+Flag a block old. 标志一个块的老的 */
 UNIV_INLINE
 void
 buf_page_set_old(

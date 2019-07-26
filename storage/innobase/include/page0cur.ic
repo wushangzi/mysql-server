@@ -232,9 +232,9 @@ page_cur_search(
 }
 
 /***********************************************************//**
-Inserts a record next to page cursor. Returns pointer to inserted record if
-succeed, i.e., enough space available, NULL otherwise. The cursor stays at
-the same logical position, but the physical position may change if it is
+Inserts a record next to page cursor. Returns pointer to inserted record if   将一条记录插入邻近的页游标中，如果成功，返回插入记录的位置
+succeed, i.e., enough space available, NULL otherwise. The cursor stays at    也就是说，有足够的可用空间，否则返回null.游标会留在相同的
+the same logical position, but the physical position may change if it is      逻辑位置，但是物理位置可以改变假如指向到一个压缩页。
 pointing to a compressed page that was reorganized.
 
 IMPORTANT: The caller will have to update IBUF_BITMAP_FREE
@@ -247,13 +247,13 @@ UNIV_INLINE
 rec_t*
 page_cur_tuple_insert(
 /*==================*/
-	page_cur_t*	cursor,	/*!< in/out: a page cursor */
-	const dtuple_t*	tuple,	/*!< in: pointer to a data tuple */
-	dict_index_t*	index,	/*!< in: record descriptor */
-	ulint**		offsets,/*!< out: offsets on *rec */
-	mem_heap_t**	heap,	/*!< in/out: pointer to memory heap, or NULL */
-	ulint		n_ext,	/*!< in: number of externally stored columns */
-	mtr_t*		mtr,	/*!< in: mini-transaction handle, or NULL */
+	page_cur_t*	cursor,	/*!< in/out: a page cursor 页的游标 */
+	const dtuple_t*	tuple,	/*!< in: pointer to a data tuple 指向数据元组 */
+	dict_index_t*	index,	/*!< in: record descriptor 索引记录描述符 */
+	ulint**		offsets,/*!< out: offsets on *rec  记录的偏移量 */
+	mem_heap_t**	heap,	/*!< in/out: pointer to memory heap, or NULL 指向内存地址*/
+	ulint		n_ext,	/*!< in: number of externally stored columns 外部存储的字段数 */
+	mtr_t*		mtr,	/*!< in: mini-transaction handle, or NULL  mini-transaction对象指针*/
 	bool		use_cache)
 				/*!< in: if true, then use record cache to
 				hold the tuple converted record. */
@@ -262,13 +262,13 @@ page_cur_tuple_insert(
 	ulint		size = rec_get_converted_size(index, tuple, n_ext);
 
 	if (!*heap) {
-		*heap = mem_heap_create(size
+		*heap = mem_heap_create(size                      //创建内存堆
 					+ (4 + REC_OFFS_HEADER_SIZE
 					   + dtuple_get_n_fields(tuple))
 					* sizeof **offsets);
 	}
 
-	rec = rec_convert_dtuple_to_rec((byte*) mem_heap_alloc(*heap, size),
+	rec = rec_convert_dtuple_to_rec((byte*) mem_heap_alloc(*heap, size),      /*从元组中将数据格式化到堆中*/
 					index, tuple, n_ext);
 
 	*offsets = rec_get_offsets(rec, index, *offsets, ULINT_UNDEFINED, heap);

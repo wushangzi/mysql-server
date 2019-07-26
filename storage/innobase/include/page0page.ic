@@ -154,7 +154,7 @@ page_set_ssn_id(
 #endif /* !UNIV_INNOCHECKSUM */
 
 /*************************************************************//**
-Reads the given header field. */
+Reads the given header field. 获取文件头部信息 */
 UNIV_INLINE
 ulint
 page_header_get_field(
@@ -277,7 +277,7 @@ page_header_reset_last_insert(
 #endif /* !UNIV_HOTBACKUP */
 
 /************************************************************//**
-Determine whether the page is in new-style compact format.
+Determine whether the page is in new-style compact format.    确认行格式是否为compact format
 @return nonzero if the page is in compact format, zero if it is in
 old-style format */
 UNIV_INLINE
@@ -290,7 +290,7 @@ page_is_comp(
 }
 
 /************************************************************//**
-TRUE if the record is on a page in compact format.
+TRUE if the record is on a page in compact format.     判断行格式是否为compact
 @return nonzero if in compact format */
 UNIV_INLINE
 ulint
@@ -379,7 +379,7 @@ page_has_garbage(
 }
 
 /************************************************************//**
-Gets the offset of the first record on the page.
+Gets the offset of the first record on the page.     获得第一条记录在page中的偏移量
 @return offset of the first record in record list, relative from page */
 UNIV_INLINE
 ulint
@@ -850,7 +850,7 @@ page_rec_get_next_low(
 
 	page = page_align(rec);
 
-	offs = rec_get_next_offs(rec, comp);
+	offs = rec_get_next_offs(rec, comp);//下一条记录的偏移量
 
 	if (offs >= UNIV_PAGE_SIZE) {
 		fprintf(stderr,
@@ -1150,7 +1150,7 @@ page_rec_write_field(
 #endif /* !UNIV_HOTBACKUP */
 
 /************************************************************//**
-Each user record on a page, and also the deleted user records in the heap
+Each user record on a page, and also the deleted user records in the heap    在页中的内一条记录，并且页包括内一条在堆中删除了的记录，
 takes its size plus the fraction of the dir cell size /
 PAGE_DIR_SLOT_MIN_N_OWNED bytes for it. If the sum of these exceeds the
 value of page_get_free_space_of_empty, the insert is impossible, otherwise
@@ -1168,12 +1168,12 @@ page_get_max_insert_size(
 	ulint	free_space;
 
 	if (page_is_comp(page)) {
-		occupied = page_header_get_field(page, PAGE_HEAP_TOP)
+		occupied = page_header_get_field(page, PAGE_HEAP_TOP)//使用中的
 			- PAGE_NEW_SUPREMUM_END
 			+ page_dir_calc_reserved_space(
 				n_recs + page_dir_get_n_heap(page) - 2);
 
-		free_space = page_get_free_space_of_empty(TRUE);
+		free_space = page_get_free_space_of_empty(TRUE);//还能使用的
 	} else {
 		occupied = page_header_get_field(page, PAGE_HEAP_TOP)
 			- PAGE_OLD_SUPREMUM_END

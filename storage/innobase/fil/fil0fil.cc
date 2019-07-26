@@ -5491,18 +5491,18 @@ fil_io_set_encryption(
 	}
 }
 
-/** Reads or writes data. This operation could be asynchronous (aio).
+/** Reads or writes data. This operation could be asynchronous (aio).读取或者写入数据，这个操作可以进行异步执行
 
-@param[in,out] type	IO context
-@param[in] sync		true if synchronous aio is desired
-@param[in] page_id	page id
-@param[in] page_size	page size
-@param[in] byte_offset	remainder of offset in bytes; in aio this
-			must be divisible by the OS block size
-@param[in] len		how many bytes to read or write; this must
-			not cross a file boundary; in aio this must
+@param[in,out] type	IO context                                       IO上下文
+@param[in] sync		true if synchronous aio is desired               true同步，false异步
+@param[in] page_id	page id                                          页id
+@param[in] page_size	page size                                    页长度
+@param[in] byte_offset	remainder of offset in bytes; in aio this    offset bytes的长度。如果是异步，这个
+			must be divisible by the OS block size                   值必须可被操作系统块长度整除
+@param[in] len		how many bytes to read or write; this must       读或者写的长度，它不能跨越文件的边界。在异步
+			not cross a file boundary; in aio this must              IO中，它必须是块长度的整数倍
 			be a block size multiple
-@param[in,out] buf	buffer where to store read data or from where
+@param[in,out] buf	buffer where to store read data or from where    接收的数据地址或者写入的数据信息。
 			to write; in aio this must be appropriately
 			aligned
 @param[in] message	message for aio handler if non-sync aio

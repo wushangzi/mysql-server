@@ -975,7 +975,7 @@ rec_get_converted_size_comp_prefix(
 }
 
 /**********************************************************//**
-Determines the size of a data tuple in ROW_FORMAT=COMPACT.
+Determines the size of a data tuple in ROW_FORMAT=COMPACT.  根据行格式为COMPACT获取元组的长度
 @return total size */
 ulint
 rec_get_converted_size_comp(
@@ -984,8 +984,8 @@ rec_get_converted_size_comp(
 					dict_table_is_comp() is
 					assumed to hold, even if
 					it does not */
-	ulint			status,	/*!< in: status bits of the record */
-	const dfield_t*		fields,	/*!< in: array of data fields */
+	ulint			status,	/*!< in: status bits of the record     记录的状态位 */
+	const dfield_t*		fields,	/*!< in: array of data fields       */
 	ulint			n_fields,/*!< in: number of data fields */
 	ulint*			extra)	/*!< out: extra size */
 {
@@ -1191,7 +1191,7 @@ rec_convert_dtuple_to_rec_old(
 }
 
 /*********************************************************//**
-Builds a ROW_FORMAT=COMPACT record out of a data tuple. */
+Builds a ROW_FORMAT=COMPACT record out of a data tuple.  根据数据的元组信息创建一个行格式为COMPACT的数据信息*/
 UNIV_INLINE
 void
 rec_convert_dtuple_to_rec_comp(
@@ -1414,17 +1414,17 @@ rec_convert_dtuple_to_rec_comp(
 }
 
 /*********************************************************//**
-Builds a new-style physical record out of a data tuple and
+Builds a new-style physical record out of a data tuple and   建立一个新的行结构的物理列并根据指定缓冲区进行存储
 stores it beginning from the start of the given buffer.
 @return pointer to the origin of physical record */
 static
 rec_t*
 rec_convert_dtuple_to_rec_new(
 /*==========================*/
-	byte*			buf,	/*!< in: start address of
+	byte*			buf,	/*!< in: start address of        要存储的物理行地址
 					the physical record */
-	const dict_index_t*	index,	/*!< in: record descriptor */
-	const dtuple_t*		dtuple)	/*!< in: data tuple */
+	const dict_index_t*	index,	/*!< in: record descriptor   索引记录描述符 */
+	const dtuple_t*		dtuple)	/*!< in: data tuple          要格式化的数据元组 */
 {
 	ulint	extra_size;
 	ulint	status;
@@ -1446,13 +1446,13 @@ rec_convert_dtuple_to_rec_new(
 }
 
 /*********************************************************//**
-Builds a physical record out of a data tuple and
+Builds a physical record out of a data tuple and   根据数据元组对象创建一个物理行并将他存储在给定的缓存对象中
 stores it beginning from the start of the given buffer.
 @return pointer to the origin of physical record */
 rec_t*
 rec_convert_dtuple_to_rec(
 /*======================*/
-	byte*			buf,	/*!< in: start address of the
+	byte*			buf,	/*!< in: start address of the   物理行的起始地址
 					physical record */
 	const dict_index_t*	index,	/*!< in: record descriptor */
 	const dtuple_t*		dtuple,	/*!< in: data tuple */
@@ -1467,8 +1467,8 @@ rec_convert_dtuple_to_rec(
 	ut_ad(dtuple_validate(dtuple));
 	ut_ad(dtuple_check_typed(dtuple));
 
-	if (dict_table_is_comp(index->table)) {
-		rec = rec_convert_dtuple_to_rec_new(buf, index, dtuple);
+	if (dict_table_is_comp(index->table)) {  //表的格式是compact
+		rec = rec_convert_dtuple_to_rec_new(buf, index, dtuple);//根据行格式进行
 	} else {
 		rec = rec_convert_dtuple_to_rec_old(buf, dtuple, n_ext);
 	}

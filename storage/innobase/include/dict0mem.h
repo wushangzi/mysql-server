@@ -548,13 +548,13 @@ struct table_name_t
 	char*	m_name;
 };
 
-/** Data structure for a column in a table */
+/** Data structure for a column in a table 表中列的结构信息 */
 struct dict_col_t{
 	/*----------------------*/
 	/** The following are copied from dtype_t,
 	so that all bit-fields can be packed tightly. */
 	/* @{ */
-	unsigned	prtype:32;	/*!< precise type; MySQL data
+	unsigned	prtype:32;	/*!< precise type; MySQL data 准确的类型
 					type, charset code, flags to
 					indicate nullability,
 					signedness, whether this is a
@@ -572,7 +572,7 @@ struct dict_col_t{
 					maximum byte length of the
 					string data (in addition to
 					the string, MySQL uses 1 or 2
-					bytes to store the string length) */
+					bytes to store the string length) 最大长度 65535 */
 
 	unsigned	mbminmaxlen:5;	/*!< minimum and maximum length of a
 					character, in bytes;
@@ -583,7 +583,7 @@ struct dict_col_t{
 	/* End of definitions copied from dtype_t */
 	/* @} */
 
-	unsigned	ind:10;		/*!< table column position
+	unsigned	ind:10;		/*!< table column position 表字段的位置
 					(starting from 0) */
 	unsigned	ord_part:1;	/*!< nonzero if this column
 					appears in the ordering fields

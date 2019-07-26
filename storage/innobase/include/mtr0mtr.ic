@@ -26,7 +26,7 @@ Created 11/26/1995 Heikki Tuuri
 #include "buf0buf.h"
 
 /**
-Pushes an object to an mtr memo stack. */
+Pushes an object to an mtr memo stack. 将一个对象推入内存栈*/
 void
 mtr_t::memo_push(void* object, mtr_memo_type_t type)
 {

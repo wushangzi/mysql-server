@@ -511,7 +511,7 @@ struct Encryption {
 #define IORequestLogRead	IORequest(IORequest::LOG | IORequest::READ)
 #define IORequestLogWrite	IORequest(IORequest::LOG | IORequest::WRITE)
 
-/**
+/**IO 上下文的
 The IO Context that is passed down to the low level IO code */
 class IORequest {
 public:

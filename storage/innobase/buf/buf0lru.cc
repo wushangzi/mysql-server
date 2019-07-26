@@ -160,7 +160,7 @@ buf_LRU_block_free_hashed_page(
 				be in a state where it can be freed */
 
 /******************************************************************//**
-Increases LRU size in bytes with page size inline function */
+Increases LRU size in bytes with page size inline function LRU长度的大小自增 */
 static inline
 void
 incr_LRU_size_in_bytes(
@@ -1726,7 +1726,7 @@ buf_LRU_add_block_to_end_low(
 }
 
 /******************************************************************//**
-Adds a block to the LRU list. Please make sure that the page_size is
+Adds a block to the LRU list. Please make sure that the page_size is   将一个块加入到
 already set when invoking the function, so that we can get correct
 page_size from the buffer page when adding a block into LRU */
 UNIV_INLINE

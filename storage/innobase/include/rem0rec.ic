@@ -305,9 +305,9 @@ rec_get_next_ptr(
 }
 
 /******************************************************//**
-The following function is used to get the offset of the next chained record
+The following function is used to get the offset of the next chained record 这个函数用于获得下一个记录链的偏移量
 on the same page.
-@return the page offset of the next chained record, or 0 if none */
+@return the page offset of the next chained record, or 0 if no ne */
 UNIV_INLINE
 ulint
 rec_get_next_offs(
@@ -1564,7 +1564,7 @@ rec_get_start(
 }
 #endif /* UNIV_DEBUG */
 
-/** Copy a physical record to a buffer.
+/** Copy a physical record to a buffer.   将一条物理行记录复制到缓冲区
 @param[in]	buf	buffer
 @param[in]	rec	physical record
 @param[in]	offsets	array returned by rec_get_offsets()

@@ -370,8 +370,8 @@ blob 块的内存信息*/
 struct mem_block_info_t {
 	ulint	magic_n;/* magic number for debugging  调式使用的魔术号 */
 #ifdef UNIV_DEBUG
-	char	file_name[8];/* file name where the mem heap was created */
-	ulint	line;	/*!< line number where the mem heap was created */
+	char	file_name[8];/* file name where the mem heap was created 从内存堆中创建对象的文件名 */
+	ulint	line;	/*!< line number where the mem heap was created  创建内存堆对应的函数 */
 #endif /* UNIV_DEBUG */
 	UT_LIST_BASE_NODE_T(mem_block_t) base; /* In the first block in the
 			the list this is the base node of the list of blocks;

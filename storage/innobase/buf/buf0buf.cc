@@ -3767,14 +3767,14 @@ got_block:
 }
 
 /********************************************************************//**
-Initialize some fields of a control block. */
+Initialize some fields of a control block.   初始化控制块中的一些信息*/
 UNIV_INLINE
 void
 buf_block_init_low(
 /*===============*/
-	buf_block_t*	block)	/*!< in: block to init */
+	buf_block_t*	block)	/*!< in: block to init 需要初始化块的信息*/
 {
-	/* No adaptive hash index entries may point to a previously
+	/* No adaptive hash index entries may point to a previously  非自适应哈希
 	unused (and now freshly allocated) block. */
 	assert_block_ahi_empty_on_init(block);
 	block->index		= NULL;
@@ -4578,7 +4578,7 @@ got_block://获得到块信息
 	      || mode == BUF_PEEK_IF_IN_POOL
 	      || !fix_block->page.file_page_was_freed);
 
-	/* Check if this is the first access to the page */
+	/* Check if this is the first access to the page 判断是否为第一次对页进行访问 */
 	access_time = buf_page_is_accessed(&fix_block->page);
 
 	/* This is a heuristic and we don't care about ordering issues. */
@@ -4589,7 +4589,7 @@ got_block://获得到块信息
 
 		buf_page_mutex_exit(fix_block);
 	}
-
+    /*如果需要,将页加入到年轻代中*/
 	if (mode != BUF_PEEK_IF_IN_POOL) {
 		buf_page_make_young_if_needed(&fix_block->page);
 	}
@@ -4601,8 +4601,8 @@ got_block://获得到块信息
 	ut_a(buf_block_get_state(fix_block) == BUF_BLOCK_FILE_PAGE);
 #endif /* UNIV_DEBUG || UNIV_BUF_DEBUG */
 
-	/* We have to wait here because the IO_READ state was set              因为在hash_lock的保护和互斥量下，IO_READ状态被设置。这个方法会进入等待状态
-	under the protection of the hash_lock and not the block->mutex
+	/* We have to wait here because the IO_READ state was set              因为在hash_lock的保护和互斥量下，
+	under the protection of the hash_lock and not the block->mutex         IO_READ状态被设置。这个方法会进入等待状态
 	and block->lock. */
 	buf_wait_for_read(fix_block);
 
@@ -4983,7 +4983,7 @@ buf_page_try_get_func(
 }
 
 /********************************************************************//**
-Initialize some fields of a control block. */
+Initialize some fields of a control block. 初始化控制块中的一些信息*/
 UNIV_INLINE
 void
 buf_page_init_low(
@@ -5037,14 +5037,14 @@ buf_page_init(
 	}
 #endif /* UNIV_DEBUG_VALGRIND */
 
-	buf_block_init_low(block);
+	buf_block_init_low(block);//块初始化底层函数
 
 	block->lock_hash_val = lock_rec_hash(page_id.space(),
 					     page_id.page_no());
 
 	buf_page_init_low(&block->page);
 
-	/* Insert into the hash table of file pages */
+	/* Insert into the hash table of file pages 在文件页的hash表插入数据*/
 
 	hash_page = buf_page_hash_get_low(buf_pool, page_id);
 

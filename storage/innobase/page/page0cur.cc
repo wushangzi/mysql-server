@@ -1424,11 +1424,11 @@ use_heap:
 		}
 	}
 
-	/* 3. Create the record */
+	/* 3. Create the record  创建记录 */
 	insert_rec = rec_copy(insert_buf, rec, offsets);
 	rec_offs_make_valid(insert_rec, index, offsets);
 
-	/* 4. Insert the record in the linked list of records */
+	/* 4. Insert the record in the linked list of records 将记录插入双向链表记录中 */
 	ut_ad(current_rec != insert_rec);
 
 	{
@@ -1461,7 +1461,7 @@ use_heap:
 
 	UNIV_MEM_ASSERT_RW(rec_get_start(insert_rec, offsets),
 			   rec_offs_size(offsets));
-	/* 6. Update the last insertion info in page header */
+	/* 6. Update the last insertion info in page header 在页的头部加入更新最后插入记录的信息*/
 
 	last_insert = page_header_get_ptr(page, PAGE_LAST_INSERT);
 	ut_ad(!last_insert || !page_is_comp(page)
@@ -1525,7 +1525,7 @@ use_heap:
 		}
 	}
 
-	/* 9. Write log record of the insert */
+	/* 9. Write log record of the insert 写入日志插入记录的日志信息 */
 	if (UNIV_LIKELY(mtr != NULL)) {
 		page_cur_insert_rec_write_log(insert_rec, rec_size,
 					      current_rec, index, mtr);

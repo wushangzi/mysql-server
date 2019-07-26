@@ -44,13 +44,13 @@ Created 2/2/1994 Heikki Tuuri
 /*			THE INDEX PAGE
 			==============
 
-The index page consists of a page header which contains the page's
-id and other information. On top of it are the index records
+The index page consists of a page header which contains the page's                   这个索引页包含一系列页头信息，包括页的id和其他信息。在它的头部
+id and other information. On top of it are the index records                         是按照记录顺序正续排列的单项链表的内存堆记录的索引页记录
 in a heap linked into a one way linear list according to alphabetic order.
 
-Just below page end is an array of pointers which we call page directory,
-to about every sixth record in the list. The pointers are placed in
-the directory in the alphabetical order of the records pointed to,
+Just below page end is an array of pointers which we call page directory,            页的底部是一系列我们叫页目录的指针，关于链表中每6条记录。这些指针
+to about every sixth record in the list. The pointers are placed in                  指向按照记录字母正序排列的记录的指针。允许我们使用数组进行二进制搜索。
+the directory in the alphabetical order of the records pointed to,                   每一个在目录中的槽指向一条路基，一个4各bit位（16）字段包含这些
 enabling us to make binary search using the array. Each slot n:o I
 in the directory points to a record, where a 4-bit field contains a count
 of those records which are in the linear list between pointer I and
@@ -229,7 +229,7 @@ page_set_max_trx_id(
 }
 
 /************************************************************//**
-Allocates a block of memory from the heap of an index page.
+Allocates a block of memory from the heap of an index page.                 从索引页的内存堆中分配一个内存块
 @return pointer to start of allocated buffer, or NULL if allocation fails */
 byte*
 page_mem_alloc_heap(

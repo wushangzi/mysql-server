@@ -2601,7 +2601,7 @@ err_exit:
 		if (mode != BTR_MODIFY_TREE) {
 			ut_ad((mode & ~BTR_ALREADY_S_LATCHED)
 			      == BTR_MODIFY_LEAF);
-			err = btr_cur_optimistic_insert(
+			err = btr_cur_optimistic_insert(//乐观锁的形式插入
 				flags, cursor, &offsets, &offsets_heap,
 				entry, &insert_rec, &big_rec,
 				n_ext, thr, &mtr);
@@ -2652,14 +2652,14 @@ err_exit:
 				row_log_table_insert(
 					insert_rec, entry, index, offsets);
 			}
-
+            //记录提交
 			mtr_commit(&mtr);
 		}
 	}
 
 func_exit:
 	if (offsets_heap != NULL) {
-		mem_heap_free(offsets_heap);
+		mem_heap_free(offsets_heap);//内存堆的释放
 	}
 
 	btr_pcur_close(&pcur);//释放pcur对象

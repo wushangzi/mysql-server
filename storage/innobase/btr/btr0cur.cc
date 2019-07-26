@@ -3213,7 +3213,7 @@ fail_err:
 				goto fail_err;
 			}
 
-			*rec = page_cur_tuple_insert(
+			*rec = page_cur_tuple_insert(//元数据页插入
 				page_cursor, entry, index, offsets, heap,
 				n_ext, mtr);
 		}
