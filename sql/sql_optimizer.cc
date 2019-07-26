@@ -94,35 +94,35 @@ static Item_func_match *test_if_ft_index_order(ORDER *order);
 static uint32 get_key_length_tmp_table(Item *item);
 
 /**
-  Optimizes one query block into a query execution plan (QEP.)
+  Optimizes one query block into a query execution plan (QEP.)                     优化一个查询块到一个QEP(query execution plan)对象中
 
-  This is the entry point to the query optimization phase. This phase
-  applies both logical (equivalent) query rewrites, cost-based join
-  optimization, and rule-based access path selection. Once an optimal
-  plan is found, the member function creates/initializes all
+  This is the entry point to the query optimization phase. This phase              这个查询优化阶段的入口函数，这个阶段既有逻辑查询重写，成本
+  applies both logical (equivalent) query rewrites, cost-based join                链接计算，还有访问路径的规则验证。假如一个优化计划被发现，那么
+  optimization, and rule-based access path selection. Once an optimal              成员函数creates/initializes所有的结构需要被查询执行。这个
+  plan is found, the member function creates/initializes all                       主要的阶段包括
   structures needed for query execution. The main optimization phases
   are outlined below:
 
-    -# Logical transformations:
-      - Outer to inner joins transformation.
-      - Equality/constant propagation.
-      - Partition pruning.
-      - COUNT(*), MIN(), MAX() constant substitution in case of
-        implicit grouping.
+    -# Logical transformations:                                                    1)逻辑转换
+      - Outer to inner joins transformation.                                           1)从外到内链接转换
+      - Equality/constant propagation.                                                 2)等值，静态的传播
+      - Partition pruning.                                                             3)分割精简
+      - COUNT(*), MIN(), MAX() constant substitution in case of                        4)隐式分组的情况下，将COUNT(*), MIN(), MAX()静态代入
+        implicit grouping.                                                             5)排序优化
       - ORDER BY optimization.
-    -# Perform cost-based optimization of table order and access path
+    -# Perform cost-based optimization of table order and access path              2)执行基于成本的表排序和访问路径的可访问性的选择优化。详见JOIN::make_join_plan()
        selection. See JOIN::make_join_plan()
-    -# Post-join order optimization:
-       - Create optimal table conditions from the where clause and the
+    -# Post-join order optimization:                                               3)执行Post-join命令优化
+       - Create optimal table conditions from the where clause and the                 1)创建最佳的表状态从聚簇和链接状态
          join conditions.
-       - Inject outer-join guarding conditions.
-       - Adjust data access methods after determining table condition
+       - Inject outer-join guarding conditions.                                        2)注入外部连接保护条件
+       - Adjust data access methods after determining table condition                  3)在确认表状态之后调整数据的访问顺序
          (several times.)
-       - Optimize ORDER BY/DISTINCT.
-    -# Code generation
-       - Set data access functions.
-       - Try to optimize away sorting/distinct.
-       - Setup temporary table usage for grouping and/or sorting.
+       - Optimize ORDER BY/DISTINCT.                                                   4)优化排序和去重函数
+    -# Code generation                                                             4)代码代
+       - Set data access functions.                                                    1)设置数据访问函数
+       - Try to optimize away sorting/distinct.                                        2)尝试优化排序和去重
+       - Setup temporary table usage for grouping and/or sorting.                      3)位分组和排序建立临时表的用法
 
   @retval 0 Success.
   @retval 1 Error, error code saved in member JOIN::error.
@@ -140,17 +140,17 @@ JOIN::optimize()
               primary_tables == 0 &&
               tables_list == (TABLE_LIST*)1);
 
-  // to prevent double initialization on EXPLAIN
+  // to prevent double initialization on EXPLAIN  组织重复进行初始化
   if (optimized)
     DBUG_RETURN(0);
-
+  //开始进行错误追踪
   Prepare_error_tracker tracker(thd);
 
   DEBUG_SYNC(thd, "before_join_optimize");
 
   THD_STAGE_INFO(thd, stage_optimizing);
 
-  if (select_lex->first_execution)
+  if (select_lex->first_execution)//第一次执行
   {
     /**
       @todo
@@ -186,7 +186,7 @@ JOIN::optimize()
   if (select_lex->get_optimizable_conditions(thd, &where_cond, &having_cond))
     DBUG_RETURN(1);
 
-  set_optimized();
+  set_optimized();//optimized= true
 
   tables_list= select_lex->get_table_list();
 
@@ -9900,7 +9900,7 @@ ORDER *JOIN::remove_const(ORDER *first_order, Item *cond, bool change_list,
 
 
 /**
-  Optimize conditions by 
+  Optimize conditions by 优化状态通过
 
      a) applying transitivity to build multiple equality predicates
         (MEP): if x=y and y=z the MEP x=y=z is built. 

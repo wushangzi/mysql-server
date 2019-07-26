@@ -4435,7 +4435,7 @@ static bool get_optimizable_join_conditions(THD *thd,
 
 
 /**
-   Returns disposable copies of WHERE/HAVING/ON conditions.
+   Returns disposable copies of WHERE/HAVING/ON conditions. 返回即用即仍的WHERE/HAVING/ON的状态拷贝
 
    This function returns a copy which can be thrashed during
    this execution of the statement. Only AND/OR items are trashable!

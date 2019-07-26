@@ -159,9 +159,9 @@ public:
       send_group_parts++;
   }
 
-  /// Query block that is optimized and executed using this JOIN
+  /// Query block that is optimized and executed using this JOIN 使用join对象进行优化和执行的请求块
   SELECT_LEX *const select_lex;
-  /// Query expression referring this query block
+  /// Query expression referring this query block 查询表达式的参考这个请求块
   SELECT_LEX_UNIT *const unit;
   /// Thread handler
   THD *const thd;

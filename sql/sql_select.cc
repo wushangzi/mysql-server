@@ -989,7 +989,7 @@ void JOIN::cleanup_item_list(List<Item> &items) const
 
 
 /**
-  Optimize a query block and all inner query expressions
+  Optimize a query block and all inner query expressions      优化一个查询块并且所有的内连查询表达式
 
   @param thd    thread handler
   @returns false if success, true if error
@@ -1000,12 +1000,12 @@ bool SELECT_LEX::optimize(THD *thd)
   DBUG_ENTER("SELECT_LEX::optimize");
 
   DBUG_ASSERT(join == NULL);
-  JOIN *const join_local= new JOIN(thd, this);
+  JOIN *const join_local= new JOIN(thd, this); /*创建链接对象*/
   if (!join_local)
     DBUG_RETURN(true);  /* purecov: inspected */
 
-  set_join(join_local);
-
+  set_join(join_local);/*this->join=join_local;*/
+  //main optimize method
   if (join->optimize())
     DBUG_RETURN(true);
 
@@ -2824,9 +2824,9 @@ const_expression_in_where(Item *cond, Item *comp_item, Field *comp_field,
 /**
   Update TMP_TABLE_PARAM with count of the different type of fields.
 
-  This function counts the number of fields, functions and sum
-  functions (items with type SUM_FUNC_ITEM) for use by
-  create_tmp_table() and stores it in the Temp_table_param object. It
+  This function counts the number of fields, functions and sum           这个参数用来计算字段，函数和合计函数的数量用来创建临时表通过
+  functions (items with type SUM_FUNC_ITEM) for use by                   create_tmp_table()。并将它存储在Temp_table_param对象
+  create_tmp_table() and stores it in the Temp_table_param object. It    中。它也会重置并计算quick_group所有物。
   also resets and calculates the quick_group property, which may have
   to be reverted if this function is called after deciding to use
   ROLLUP (see JOIN::optimize_rollup()).
@@ -3024,7 +3024,7 @@ calc_group_buffer(JOIN *join,ORDER *group)
 
 
 /**
-  Make an array of pointers to sum_functions to speed up
+  Make an array of pointers to sum_functions to speed up 创建一组指针数组去sum_functions去加速合并函数的计算
   sum_func calculation.
 
   @retval

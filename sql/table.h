@@ -1816,7 +1816,7 @@ struct TABLE_LIST
                    mdl_type_for_dml(lock_type_arg));
   }
 
-  /// Create a TABLE_LIST object representing a nested join
+  /// Create a TABLE_LIST object representing a nested join   创建一个TABLE_LIST 对象代表一个嵌套连接
   static TABLE_LIST *new_nested_join(MEM_ROOT *allocator,
                                      const char *alias,
                                      TABLE_LIST *embedding,
@@ -1858,9 +1858,9 @@ struct TABLE_LIST
   /// Merge tables from a query block into a nested join structure
   bool merge_underlying_tables(class st_select_lex *select);
 
-  /// Reset table
+  /// Reset table   表重置
   void reset();
-
+  //计算md5值
   void calc_md5(char *buffer);
 
   /// Evaluate the check option of a view
