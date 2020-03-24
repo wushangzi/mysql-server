@@ -208,6 +208,7 @@ protected:
   virtual bool explain_rows_and_filtered() { return false; }
   virtual bool explain_extra() { return false; }
   virtual bool explain_modify_flags() { return false; }
+  virtual bool explain_suggest_index() {return false; }
 
 protected:
   /**
@@ -398,6 +399,8 @@ protected:
   {
     return true;                        // Because we know that we have a plan
   }
+
+  virtual bool explain_suggest_index();
 };
 
 
@@ -632,7 +635,8 @@ bool Explain::prepare_columns()
     explain_ref() ||
     explain_modify_flags() ||
     explain_rows_and_filtered() ||
-    explain_extra();
+    explain_extra() ||
+	explain_suggest_index();
 }
 
 
@@ -1690,6 +1694,12 @@ bool Explain_join::explain_extra()
     }
   }
   return false;
+}
+
+bool Explain_join::explain_suggest_index()
+{
+	fmt->entry()->col_suggest_index.set("hello world");
+	return false;
 }
 
 

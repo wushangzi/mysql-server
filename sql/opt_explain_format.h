@@ -303,6 +303,7 @@ public:
   List<const char> col_ref; ///< "ref":columns/constants which are compared to "key"
   column<float>    col_filtered; ///< "filtered": % of rows filtered by condition
   List<extra> col_extra; ///< "extra" column (traditional) or property list
+  mem_root_str col_suggest_index; /// "suggest_index" column information
 
   // non-TRADITIONAL stuff:
   mem_root_str col_message; ///< replaces "Extra" column if not empty
@@ -367,6 +368,7 @@ public:
     col_message.cleanup();
     col_attached_condition.cleanup();
     col_key_parts.empty();
+    col_suggest_index.cleanup();
 
     col_rows.cleanup();
     col_prefix_rows.cleanup();

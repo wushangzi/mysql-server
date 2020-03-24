@@ -252,6 +252,8 @@ bool Explain_format_traditional::flush_entry()
       return true;
   }
 
+  push(&items, column_buffer.col_suggest_index, nil);
+
   if (output->send_data(items))
     return true;
   return false;

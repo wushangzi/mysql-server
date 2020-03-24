@@ -2545,6 +2545,10 @@ int THD::send_explain_fields(Query_result *result)
                                             0.1234, 2, 4));
   item->maybe_null=1;
   field_list.push_back(new Item_empty_string("Extra", 255, cs));
+
+  item->maybe_null=1;
+  field_list.push_back(item= new Item_empty_string("suggest_index", 255, cs));
+
   item->maybe_null= 1;
   return (result->send_result_set_metadata(field_list, Protocol::SEND_NUM_ROWS |
                                            Protocol::SEND_EOF));
