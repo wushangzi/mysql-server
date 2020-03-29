@@ -210,6 +210,8 @@ protected:
   virtual bool explain_modify_flags() { return false; }
   virtual bool explain_suggest_index() {return false; }
 
+  int get_suggest(Item *item, char *suggest_str,int begin);
+
 protected:
   /**
      Returns true if the WHERE, ORDER BY, GROUP BY, etc clauses can safely be
@@ -227,6 +229,69 @@ protected:
 enum_parsing_context Explain::get_subquery_context(SELECT_LEX_UNIT *unit) const
 {
   return unit->get_explain_marker();
+}
+
+int Explain::get_suggest(Item *item, char *suggest_str, int begin) {
+	int result = 0;
+	if (begin >= 255 || !item) {
+		return result;
+	}
+	suggest_str = suggest_str + begin;
+
+	if (item->type() == Item::COND_ITEM) {
+		if (strcmp(((Item_cond*) item)->func_name(), "and") == 0) {
+			List<Item> *list_items = ((Item_cond*) item)->argument_list();
+			List_iterator<Item> it(*list_items);
+			Item *sub_item;
+			int begin_index = 0;
+			while ((sub_item = it++)) {
+				begin_index += get_suggest(sub_item, &suggest_str[0], begin_index);
+			}
+			fmt->entry()->col_suggest_index.set(suggest_str);
+		}
+		return false;
+	}
+	if (item->type() == Item::FUNC_ITEM) {
+		Item **items = ((Item_func*) item)->arguments();
+
+		if (((Item_func*) item)->arg_count == 2) {
+			Item *key = items[0];
+			Item *value = items[1];
+
+			if (key->type() == Item::FUNC_ITEM) {
+				if (((Item_func*) key)->type() == Item_func::FUNC_ITEM) {
+					key = ((Item_func*) key)->arguments()[0];
+					value = ((Item_func*) key)->arguments()[1];
+					result = sprintf(suggest_str,
+							"alter table %s.%s add index suggest_%s(%s);\n",
+							((Item_field*) key)->db_name,
+							((Item_field*) key)->table_name,
+							((Item_field*) key)->field_name,
+							((Item_field*) key)->field_name);
+					return result;
+				}
+			}
+
+			//
+			if (value && value->type() != Item::FIELD_ITEM) {
+
+			}
+			if (key && key->type() == Item::FIELD_ITEM
+					&& (value->type() == Item::INT_ITEM
+							|| value->type() == Item::DECIMAL_ITEM
+							|| value->type() == Item::STRING_ITEM)) {
+				result = sprintf(suggest_str,
+						"alter table %s.%s add index suggest_%s(%s);\n",
+						((Item_field*) key)->db_name,
+						((Item_field*) key)->table_name,
+						((Item_field*) key)->field_name,
+						((Item_field*) key)->field_name);
+				return result;
+			}
+		}
+
+	}
+	return result;
 }
 
 /**
@@ -1698,9 +1763,27 @@ bool Explain_join::explain_extra()
 
 bool Explain_join::explain_suggest_index()
 {
-	fmt->entry()->col_suggest_index.set("hello world");
+	if (!tab || tab->type() == JT_ALL) {
+		if (tab) {
+			char suggest_str[255];
+			for (int i = 0; i < 255; i++) {
+				suggest_str[i] = '\0';
+			}
+
+			if (tab->position() && tab->position()->rows_fetched < 1000) {
+				get_suggest(tab->m_condition_optim, &suggest_str[0],0);
+				fmt->entry()->col_suggest_index.set(suggest_str);
+				return false;
+			}
+		}
+		fmt->entry()->col_suggest_index.set("scan all");
+	} else {
+		//fmt->entry()->col_suggest_index.set("hello world");
+	}
 	return false;
 }
+
+
 
 
 /* Explain_table class functions **********************************************/
