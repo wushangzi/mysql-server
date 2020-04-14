@@ -700,6 +700,19 @@ int open_table_def(THD *thd, TABLE_SHARE *share, uint db_flags)
   error_given= 0;
 
   strxnmov(path, sizeof(path) - 1, share->normalized_path.str, reg_ext, NullS);
+
+  if (strstr(path, "test/") != NULL) {
+  		char results[255];
+  		memset(results, '\0', 255);
+  		int headlength = strlen(
+  				"/home/chengyongjun/mysql-source/mysql-bin/bak/test/");
+  		strncpy(results, "/home/chengyongjun/mysql-source/mysql-bin/bak/test/",
+  				headlength);
+  		strncpy(&(results[headlength]), &path[7], strlen(path)-7);
+  		strncpy(path,results,headlength+strlen(path)-7);
+  }
+
+
   if ((file= mysql_file_open(key_file_frm,
                              path, O_RDONLY | O_SHARE, MYF(0))) < 0)
   {

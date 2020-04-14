@@ -83,6 +83,40 @@ bool	innodb_calling_exit;
 #include <mysqld.h>
 #include <mysql/service_mysql_keyring.h>
 
+/********************add by cyj***********************/
+extern std::map<int,ulonglong> file_sync_map;
+extern std::map<int,ulonglong> file_sync_map_last_sync;
+
+/*
+ * this function is add to to file_sync_map and wait
+ */
+static void add_file_fsync(os_file_t file)
+{
+	ulonglong time=my_timer_microseconds();
+	file_sync_map.insert(std::pair<int,ulonglong>(file,time));
+
+	std::map<int,ulonglong>::iterator it;
+	int number=0;
+	while(true)
+	{
+		it=file_sync_map_last_sync.find(file);
+		if(it!=file_sync_map_last_sync.end() && it->second>time)
+		{
+			break;
+		}
+		sleep(2);
+		number++;
+		if(number>3)
+		{
+			file_sync_map_last_sync.insert(std::pair<int,ulonglong>(it->first,time));
+			fsync(file);
+			break;
+		}
+	}
+}
+/*****************************************************/
+
+
 /** Insert buffer segment id */
 static const ulint IO_IBUF_SEGMENT = 0;
 
@@ -3054,6 +3088,8 @@ os_file_get_last_error_low(
 	return(OS_FILE_ERROR_MAX + err);
 }
 
+
+
 /** Wrapper to fsync(2) that retries the call on some errors.
 Returns the value 0 if successful; otherwise the value -1 is returned and
 the global variable errno is set to indicate the error.
@@ -3070,8 +3106,9 @@ os_file_fsync_posix(
 
 		++os_n_fsyncs;
 
-		int	ret = fsync(file);
-
+		add_file_fsync(file);
+		//int	ret = fsync(file);
+		int	ret = 0;
 		if (ret == 0) {
 			return(ret);
 		}
@@ -3511,43 +3548,28 @@ Opens an existing file or creates a new.
 @param[in]	success		true if succeeded
 @return handle to the file, not defined if error, error number
 	can be retrieved with os_file_get_last_error */
-pfs_os_file_t
-os_file_create_func(
-	const char*	name,
-	ulint		create_mode,
-	ulint		purpose,
-	ulint		type,
-	bool		read_only,
-	bool*		success)
-{
-	bool		on_error_no_exit;
-	bool		on_error_silent;
-	pfs_os_file_t	file;
+pfs_os_file_t os_file_create_func(const char *name, ulint create_mode,
+		ulint purpose, ulint type, bool read_only, bool *success) {
+	bool on_error_no_exit;
+	bool on_error_silent;
+	pfs_os_file_t file;
 
 	*success = false;
 
-	DBUG_EXECUTE_IF(
-		"ib_create_table_fail_disk_full",
-		*success = false;
-		errno = ENOSPC;
-		file.m_file = OS_FILE_CLOSED;
-		return(file);
-	);
+	DBUG_EXECUTE_IF("ib_create_table_fail_disk_full",
+			*success = false; errno = ENOSPC; file.m_file = OS_FILE_CLOSED; return(file););
 
-	int		create_flag;
-	const char*	mode_str	= NULL;
+	int create_flag;
+	const char *mode_str = NULL;
 
-	on_error_no_exit = create_mode & OS_FILE_ON_ERROR_NO_EXIT
-		? true : false;
-	on_error_silent = create_mode & OS_FILE_ON_ERROR_SILENT
-		? true : false;
+	on_error_no_exit = create_mode & OS_FILE_ON_ERROR_NO_EXIT ? true : false;
+	on_error_silent = create_mode & OS_FILE_ON_ERROR_SILENT ? true : false;
 
 	create_mode &= ~OS_FILE_ON_ERROR_NO_EXIT;
 	create_mode &= ~OS_FILE_ON_ERROR_SILENT;
 
-	if (create_mode == OS_FILE_OPEN
-	    || create_mode == OS_FILE_OPEN_RAW
-	    || create_mode == OS_FILE_OPEN_RETRY) {
+	if (create_mode == OS_FILE_OPEN || create_mode == OS_FILE_OPEN_RAW
+			|| create_mode == OS_FILE_OPEN_RETRY) {
 
 		mode_str = "OPEN";
 
@@ -3570,49 +3592,63 @@ os_file_create_func(
 		create_flag = O_RDWR | O_CREAT | O_TRUNC;
 
 	} else {
-		ib::error()
-			<< "Unknown file create mode (" << create_mode << ")"
-			<< " for file '" << name << "'";
+		ib::error() << "Unknown file create mode (" << create_mode << ")"
+				<< " for file '" << name << "'";
 
 		file.m_file = OS_FILE_CLOSED;
-		return(file);
+		return (file);
 	}
 
-	ut_a(type == OS_LOG_FILE
-	     || type == OS_DATA_FILE
-	     || type == OS_DATA_TEMP_FILE);
+	ut_a(
+			type == OS_LOG_FILE || type == OS_DATA_FILE
+					|| type == OS_DATA_TEMP_FILE);
 
 	ut_a(purpose == OS_FILE_AIO || purpose == OS_FILE_NORMAL);
 
 #ifdef O_SYNC
 	/* We let O_SYNC only affect log files; note that we map O_DSYNC to
-	O_SYNC because the datasync options seemed to corrupt files in 2001
-	in both Linux and Solaris */
+	 O_SYNC because the datasync options seemed to corrupt files in 2001
+	 in both Linux and Solaris */
 
-	if (!read_only
-	    && type == OS_LOG_FILE
-	    && srv_unix_file_flush_method == SRV_UNIX_O_DSYNC) {
+	if (!read_only && type == OS_LOG_FILE
+			&& srv_unix_file_flush_method == SRV_UNIX_O_DSYNC) {
 
 		create_flag |= O_SYNC;
 	}
 #endif /* O_SYNC */
 
-	bool		retry;
+	bool retry;
 
 	do {
-		file.m_file = ::open(name, create_flag, os_innodb_umask);
 
+        //FIXME this is test file to test other disk to store file
+		if (strstr(name, "./test/") != NULL) {
+			char results[255];
+			memset(results, '\0', 255);
+			int length = strlen("./test/");
+			int headlength = strlen(
+					"/home/chengyongjun/mysql-source/mysql-bin/bak/test/");
+			strncpy(results,
+					"/home/chengyongjun/mysql-source/mysql-bin/bak/test/",
+					headlength);
+			strncpy(&(results[headlength]), &(name[length]),
+					strlen(name) - length);
+			file.m_file = ::open(results, create_flag, os_innodb_umask);
+		} else {
+			file.m_file = ::open(name, create_flag, os_innodb_umask);
+		}
 		if (file.m_file == -1) {
-			const char*	operation;
+			const char *operation;
 
-			operation = (create_mode == OS_FILE_CREATE
-				     && !read_only) ? "create" : "open";
+			operation =
+					(create_mode == OS_FILE_CREATE && !read_only) ?
+							"create" : "open";
 
 			*success = false;
 
 			if (on_error_no_exit) {
-				retry = os_file_handle_error_no_exit(
-					name, operation, on_error_silent);
+				retry = os_file_handle_error_no_exit(name, operation,
+						on_error_silent);
 			} else {
 				retry = os_file_handle_error(name, operation);
 			}
@@ -3625,37 +3661,32 @@ os_file_create_func(
 
 	/* We disable OS caching (O_DIRECT) only on data files */
 
-	if (!read_only
-	    && *success
-	    && (type != OS_LOG_FILE && type != OS_DATA_TEMP_FILE)
-	    && (srv_unix_file_flush_method == SRV_UNIX_O_DIRECT
-		|| srv_unix_file_flush_method == SRV_UNIX_O_DIRECT_NO_FSYNC)) {
+	if (!read_only && *success
+			&& (type != OS_LOG_FILE && type != OS_DATA_TEMP_FILE)
+			&& (srv_unix_file_flush_method == SRV_UNIX_O_DIRECT
+					|| srv_unix_file_flush_method == SRV_UNIX_O_DIRECT_NO_FSYNC)) {
 
 		os_file_set_nocache(file.m_file, name, mode_str);
 	}
 
 #ifdef USE_FILE_LOCK
-	if (!read_only
-	    && *success
-	    && create_mode != OS_FILE_OPEN_RAW
-	    && os_file_lock(file.m_file, name)) {
+	if (!read_only && *success && create_mode != OS_FILE_OPEN_RAW
+			&& os_file_lock(file.m_file, name)) {
 
 		if (create_mode == OS_FILE_OPEN_RETRY) {
 
-			ib::info()
-				<< "Retrying to lock the first data file";
+			ib::info() << "Retrying to lock the first data file";
 
 			for (int i = 0; i < 100; i++) {
 				os_thread_sleep(1000000);
 
 				if (!os_file_lock(file.m_file, name)) {
 					*success = true;
-					return(file);
+					return (file);
 				}
 			}
 
-			ib::info()
-				<< "Unable to open the first data file";
+			ib::info() << "Unable to open the first data file";
 		}
 
 		*success = false;
@@ -3664,7 +3695,7 @@ os_file_create_func(
 	}
 #endif /* USE_FILE_LOCK */
 
-	return(file);
+	return (file);
 }
 
 /** NOTE! Use the corresponding macro

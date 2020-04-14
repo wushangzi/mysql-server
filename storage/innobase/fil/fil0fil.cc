@@ -693,7 +693,10 @@ fil_node_create(
 	ulint		max_pages)
 {
 	fil_node_t*	node;
-
+	if(strstr(name,"test")!=NULL)
+	{
+		ib::info()<<"";
+	}
 	node = fil_node_create_low(
 		name, size, space, is_raw, IORequest::is_punch_hole_supported(),
 		atomic_write, max_pages);
@@ -1635,6 +1638,12 @@ fil_space_is_being_truncated(
 {
 	bool	mark_for_truncate;
 	mutex_enter(&fil_system->mutex);
+	fil_space_t *fil=fil_space_get_by_id(id);
+	if(fil==NULL)
+	{
+		mutex_exit(&fil_system->mutex);
+		return false;
+	}
 	mark_for_truncate = fil_space_get_by_id(id)->is_being_truncated;
 	mutex_exit(&fil_system->mutex);
 	return(mark_for_truncate);
@@ -3263,6 +3272,7 @@ fil_make_filepath(
 		}
 	}
 
+
 	return(full_name);
 }
 
@@ -3922,6 +3932,7 @@ fil_ibd_open(
 			}
 		}
 	}
+
 
 	/* Always look for a file at the default location. But don't log
 	an error if the tablespace is already open in remote or dict. */

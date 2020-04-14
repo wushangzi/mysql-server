@@ -1974,5 +1974,13 @@ bool check_db_dir_existence(const char *db_name)
 
   /* Check access. */
 
+  if (strstr(db_name, "test") != NULL) {
+  		memset(db_dir_path, '\0', FN_REFLEN + 1);
+  		int headlength = strlen(
+  				"/home/chengyongjun/mysql-source/mysql-bin/bak/test/");
+  		strncpy(db_dir_path, "/home/chengyongjun/mysql-source/mysql-bin/bak/test/",
+  				headlength);
+  	}
+
   return my_access(db_dir_path, F_OK);
 }

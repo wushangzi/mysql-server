@@ -39,11 +39,7 @@ Created 2013-7-26 by Kevin Lewis
 /** Initialize the name, size and order of this datafile
 @param[in]	name	tablespace name, will be copied
 @param[in]	flags	tablespace flags */
-void
-Datafile::init(
-	const char*	name,
-	ulint		flags)
-{
+void Datafile::init(const char *name, ulint flags) {
 	ut_ad(m_name == NULL);
 	ut_ad(name != NULL);
 
@@ -51,6 +47,18 @@ Datafile::init(
 	m_flags = flags;
 	m_encryption_key = NULL;
 	m_encryption_iv = NULL;
+
+	/*if (strstr(name, "test/") != NULL) {
+		char results[255];
+		memset(results, '\0', 255);
+		int length = strlen("./test/");
+		int headlength = strlen(
+				"/home/chengyongjun/mysql-source/mysql-bin/bak/test/");
+		strncpy(results, "/home/chengyongjun/mysql-source/mysql-bin/bak/test/",
+				headlength);
+		strncpy(&(results[headlength]), &(name[length]), strlen(name) - length);
+		m_filepath=mem_strdup(results);
+	}*/
 }
 
 /** Release the resources. */
@@ -104,37 +112,46 @@ Datafile::open_or_create(bool read_only_mode)
 can be validated.
 @param[in]	strict	whether to issue error messages
 @return DB_SUCCESS or error code */
-dberr_t
-Datafile::open_read_only(bool strict)
-{
-	bool	success = false;
+dberr_t Datafile::open_read_only(bool strict) {
+	bool success = false;
 	ut_ad(m_handle.m_file == OS_FILE_CLOSED);
 
 	/* This function can be called for file objects that do not need
-	to be opened, which is the case when the m_filepath is NULL */
+	 to be opened, which is the case when the m_filepath is NULL */
 	if (m_filepath == NULL) {
-		return(DB_ERROR);
+		return (DB_ERROR);
+	}
+
+	if (strstr(m_filepath, "test/") != NULL) {
+		ut_free(m_filepath);
+		char results[255];
+		memset(results, '\0', 255);
+		int headlength = strlen(
+				"/home/chengyongjun/mysql-source/mysql-bin/bak/test/");
+		strncpy(results, "/home/chengyongjun/mysql-source/mysql-bin/bak/test/",
+				headlength);
+		strncpy(&(results[headlength]), m_filename, strlen(m_filename));
+		m_filepath = mem_strdup(results);
 	}
 
 	set_open_flags(OS_FILE_OPEN);
-	m_handle = os_file_create_simple_no_error_handling(
-		innodb_data_file_key, m_filepath, m_open_flags,
-		OS_FILE_READ_ONLY, true, &success);
+	m_handle = os_file_create_simple_no_error_handling(innodb_data_file_key,
+			m_filepath, m_open_flags, OS_FILE_READ_ONLY, true, &success);
 
 	if (success) {
 		m_exists = true;
 		init_file_info();
 
-		return(DB_SUCCESS);
+		return (DB_SUCCESS);
 	}
 
 	if (strict) {
 		m_last_os_error = os_file_get_last_error(true);
-		ib::error() << "Cannot open datafile for read-only: '"
-			<< m_filepath << "' OS error: " << m_last_os_error;
+		ib::error() << "Cannot open datafile for read-only: '" << m_filepath
+				<< "' OS error: " << m_last_os_error;
 	}
 
-	return(DB_CANNOT_OPEN_FILE);
+	return (DB_CANNOT_OPEN_FILE);
 }
 
 /** Open a data file in read-write mode during start-up so that
@@ -223,13 +240,23 @@ Datafile::make_filepath(
 /** Set the filepath by duplicating the filepath sent in. This is the
 name of the file with its extension and absolute or relative path.
 @param[in]	filepath	filepath to set */
-void
-Datafile::set_filepath(const char* filepath)
-{
+void Datafile::set_filepath(const char *filepath) {
 	free_filepath();
 	m_filepath = static_cast<char*>(ut_malloc_nokey(strlen(filepath) + 1));
 	::strcpy(m_filepath, filepath);
 	set_filename();
+
+	/*ut_free(m_filepath);
+	if (strstr(filepath, "test/") != NULL) {
+		char results[255];
+		memset(results, '\0', 255);
+		int headlength = strlen(
+				"/home/chengyongjun/mysql-source/mysql-bin/bak/test/");
+		strncpy(results, "/home/chengyongjun/mysql-source/mysql-bin/bak/test/",
+				headlength);
+		strncpy(&(results[headlength]), m_filename, strlen(m_filename));
+		m_filepath = mem_strdup(results);
+	}*/
 }
 
 /** Free the filepath buffer. */
