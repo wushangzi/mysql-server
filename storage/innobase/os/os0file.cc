@@ -104,7 +104,7 @@ static void add_file_fsync(os_file_t file)
 		{
 			break;
 		}
-		sleep(2);
+		usleep(2000);
 		number++;
 		if(number>3)
 		{

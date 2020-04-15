@@ -286,6 +286,8 @@ DECLARE_THREAD(srv_fync_file)(void*	arg)
 			ib::info()<<"thread srv_fync_file run out!!!!!";
 			break;
 		}
+
+		usleep(5000);
 	}
 
 	pthread_detach(pthread_self());
