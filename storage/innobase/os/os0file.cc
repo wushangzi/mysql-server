@@ -83,6 +83,8 @@ bool	innodb_calling_exit;
 #include <mysqld.h>
 #include <mysql/service_mysql_keyring.h>
 
+
+
 /********************add by cyj***********************/
 extern std::map<int,ulonglong> file_sync_map;
 extern std::map<int,ulonglong> file_sync_map_last_sync;
@@ -93,23 +95,37 @@ extern std::map<int,ulonglong> file_sync_map_last_sync;
 static void add_file_fsync(os_file_t file)
 {
 	ulonglong time=my_timer_microseconds();
-	file_sync_map.insert(std::pair<int,ulonglong>(file,time));
 
-	std::map<int,ulonglong>::iterator it;
 	int number=0;
 	while(true)
 	{
-		it=file_sync_map_last_sync.find(file);
-		if(it!=file_sync_map_last_sync.end() && it->second>time)
+		std::map<int,ulonglong>::iterator it=file_sync_map_last_sync.find(file);
+		std::map<int,ulonglong>::iterator front=file_sync_map.find(file);
+		if(it==file_sync_map_last_sync.end())
 		{
+			ib::info()<<"method fsync is running!!";
+			fsync(file);
+			file_sync_map.insert(std::pair<int,ulonglong>(file,time));
+			file_sync_map_last_sync.insert(std::pair<int,ulonglong>(file,time));
+			return;
+		}
+		if(front!=file_sync_map.end() && front->second<time)
+		{
+			front->second=time;
+		}
+		if(it!=file_sync_map_last_sync.end() && it->second>=time)
+		{
+			ib::info()<<"method break is running!!";
 			break;
 		}
-		usleep(2000);
+		usleep(20000);
 		number++;
 		if(number>3)
 		{
-			file_sync_map_last_sync.insert(std::pair<int,ulonglong>(it->first,time));
+			it->second=time;
 			fsync(file);
+			ib::info()<<"method add_file_fsync is running!! file id: "<<
+			it->first<<"  used time: "<<my_timer_microseconds()-time;
 			break;
 		}
 	}

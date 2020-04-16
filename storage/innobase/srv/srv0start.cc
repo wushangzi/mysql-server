@@ -265,29 +265,33 @@ srv_file_check_mode(
 	return(true);
 }
 
-extern "C" os_thread_ret_t
-DECLARE_THREAD(srv_fync_file)(void*	arg)
-{
-	while(true)
-	{
-		std::map<int,ulonglong>::iterator it=file_sync_map.begin();
-		for(;it!=file_sync_map.end();it++)
-		{
-			ulonglong time=my_timer_microseconds();
-			if(time-it->second>5 || srv_shutdown_state!=SRV_SHUTDOWN_NONE)
-			{
-				fsync(it->first);
-			    file_sync_map_last_sync.insert(std::pair<int,ulonglong>(it->first,time));
+extern "C" os_thread_ret_t DECLARE_THREAD(srv_fync_file)(void *arg) {
+	while (true) {
+		std::map<int, ulonglong>::iterator it = file_sync_map.begin();
+		for (; it != file_sync_map.end(); it++) {
+			std::map<int, ulonglong>::iterator sub =
+					file_sync_map_last_sync.find(it->first);
+			ulonglong time = my_timer_microseconds();
+
+			if (sub != file_sync_map_last_sync.end()
+					&& sub->second != it->second) {
+				if (time - it->second > 5000
+						|| srv_shutdown_state != SRV_SHUTDOWN_NONE) {
+					fsync(it->first);
+					ib::info()<<"method srv_fync_file is running!! file id: "<<
+					it->first<<"  used time: "<<my_timer_microseconds()-time;
+					sub->second=it->second;
+				}
 			}
+
 		}
 
-		if(srv_shutdown_state!=SRV_SHUTDOWN_NONE)
-		{
-			ib::info()<<"thread srv_fync_file run out!!!!!";
+		if (srv_shutdown_state != SRV_SHUTDOWN_NONE) {
+			ib::info() << "thread srv_fync_file run out!!!!!";
 			break;
 		}
 
-		usleep(5000);
+		//usleep(500);
 	}
 
 	pthread_detach(pthread_self());
