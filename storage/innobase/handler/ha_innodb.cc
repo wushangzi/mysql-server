@@ -145,6 +145,8 @@ static ulong innobase_write_io_threads;
 
 static long long innobase_buffer_pool_size, innobase_log_file_size;
 
+long long innobase_back_redo_flush_time;
+
 /** Percentage of the buffer pool to reserve for 'old' blocks.
 Connected to buf_LRU_old_ratio. */
 static uint innobase_old_blocks_pct;
@@ -17807,6 +17809,8 @@ innodb_buffer_pool_size_update(
 		<< " (new size: " << in_val << " bytes)";
 }
 
+
+
 /*************************************************************//**
 Check whether valid argument given to "innodb_fts_internal_tbl_name"
 This function is registered as a callback with MySQL.
@@ -19734,6 +19738,16 @@ static MYSQL_SYSVAR_LONGLONG(buffer_pool_size, innobase_buffer_pool_size,
   static_cast<longlong>(srv_buf_pool_min_size),
   LLONG_MAX, 1024*1024L);
 
+static MYSQL_SYSVAR_LONGLONG(back_redo_flush_time, innobase_back_redo_flush_time,
+  PLUGIN_VAR_RQCMDARG,
+  "The number of the time uses to set background time interval",
+  NULL,
+  NULL,
+  static_cast<longlong>(srv_back_redo_flush_time),
+  static_cast<longlong>(srv_back_redo_min_flush_time),
+  LLONG_MAX, 1024*1024L);
+
+
 static MYSQL_SYSVAR_ULONGLONG(buffer_pool_chunk_size, srv_buf_pool_chunk_unit,
   PLUGIN_VAR_RQCMDARG | PLUGIN_VAR_READONLY,
   "Size of a single memory chunk within each buffer pool instance"
@@ -20301,6 +20315,9 @@ static MYSQL_SYSVAR_BOOL(sync_debug, srv_sync_debug,
 #endif /* UNIV_DEBUG */
 
 static struct st_mysql_sys_var* innobase_system_variables[]= {
+  /*background flush thread info*/
+  MYSQL_SYSVAR(back_redo_flush_time),
+
   MYSQL_SYSVAR(api_trx_level),
   MYSQL_SYSVAR(api_bk_commit_interval),
   MYSQL_SYSVAR(autoextend_increment),

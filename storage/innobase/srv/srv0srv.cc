@@ -242,6 +242,9 @@ srv_printf_innodb_monitor() will request mutex acquisition
 with mutex_enter(), which will wait until it gets the mutex. */
 #define MUTEX_NOWAIT(mutex_skipped)	((mutex_skipped) < MAX_MUTEX_NOWAIT)
 
+ulint srv_back_redo_flush_time = 100000;
+const ulint	srv_back_redo_min_flush_time	= 10000;
+
 /** Requested size in bytes */
 ulint	srv_buf_pool_size	= ULINT_MAX;
 /** Minimum pool size in bytes */
@@ -2327,7 +2330,7 @@ srv_master_sleep(void)
 /*==================*/
 {
 	srv_main_thread_op_info = "sleeping";
-	os_thread_sleep(1000000);
+	os_thread_sleep(innobase_back_redo_flush_time);
 	srv_main_thread_op_info = "";
 }
 

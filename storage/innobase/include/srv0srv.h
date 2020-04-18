@@ -248,6 +248,8 @@ extern ulint	srv_undo_tablespaces_active;
 /** The number of undo segments to use */
 extern ulong	srv_rollback_segments;
 
+extern long long innobase_back_redo_flush_time;
+
 /* Used for the deprecated setting innodb_undo_logs. This will get put into
 srv_rollback_segments if it is set to non=default */
 extern ulong	srv_undo_logs;
@@ -296,6 +298,10 @@ extern my_bool	srv_flush_sync;
 even if they are marked as "corrupted". Mostly it is for DBA to process
 corrupted index and table */
 extern my_bool	srv_load_corrupted;
+
+/*this two para is to background time in innodb flush thread*/
+extern ulint srv_back_redo_flush_time;
+extern const ulint	srv_back_redo_min_flush_time;
 
 /** Requested size in bytes */
 extern ulint		srv_buf_pool_size;

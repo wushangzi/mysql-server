@@ -3097,7 +3097,9 @@ DECLARE_THREAD(buf_flush_page_cleaner_coordinator)(
 			/*!< in: a dummy parameter required by
 			os_thread_create */
 {
-	ulint	next_loop_time = ut_time_ms() + 1000;
+	ulint   next_interval_time=1000000;
+
+	ulint	next_loop_time = ut_time_ms() + next_interval_time;
 	ulint	n_flushed = 0;
 	ulint	last_activity = srv_get_activity_count();
 	ulint	last_pages = 0;
@@ -3232,7 +3234,7 @@ DECLARE_THREAD(buf_flush_page_cleaner_coordinator)(
 				warn_count = 0;
 			}
 
-			next_loop_time = curr_time + 1000;
+			next_loop_time = curr_time + next_interval_time;
 			n_flushed_last = n_evicted = 0;
 		}
 
@@ -3340,6 +3342,8 @@ DECLARE_THREAD(buf_flush_page_cleaner_coordinator)(
 			}
 
 		} else if (ret_sleep == OS_SYNC_TIME_EXCEEDED) {
+
+			os_thread_sleep(next_interval_time*1000l);
 			/* no activity, slept enough */
 			buf_flush_lists(PCT_IO(100), LSN_MAX, &n_flushed);
 
@@ -3396,7 +3400,7 @@ DECLARE_THREAD(buf_flush_page_cleaner_coordinator)(
 
 		/* We sleep only if there are no pages to flush */
 		if (n_flushed == 0) {
-			os_thread_sleep(100000);
+			os_thread_sleep(innobase_back_redo_flush_time);
 		}
 	} while (srv_shutdown_state == SRV_SHUTDOWN_CLEANUP);
 
